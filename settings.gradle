@@ -1,0 +1,2 @@
+rootProject.name='Hourly'
+include ':app'
