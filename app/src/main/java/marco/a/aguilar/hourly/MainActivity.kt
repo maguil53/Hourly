@@ -34,6 +34,8 @@ class MainActivity : AppCompatActivity() {
          * and drawable here because the icon/text won't show up if you just
          * put it in the XML file.
          */
+
+        tab_layout.setBackgroundColor(Color.parseColor("#1F1F1F"))
         tab_layout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
 
             override fun onTabSelected(tab: TabLayout.Tab?) {
