@@ -13,7 +13,6 @@ import marco.a.aguilar.hourly.MainActivity.Companion.fragmentList
 // documentation did it from a Fragment.
 class MainFragmentAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
 
-
     override fun getItemCount(): Int = 2 // Only 2 Tabs
 
     override fun createFragment(position: Int): Fragment {
