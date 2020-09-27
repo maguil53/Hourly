@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+
+    <!-- "Mark Favorite", should appear as action button if possible -->
+    <item
+        android:id="@+id/action_recovery"
+        android:icon="@drawable/ic_recovery"
+        android:title="@string/menu_item_recovery"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_theme_toggle"
+        android:icon="@drawable/ic_theme_toggle"
+        android:title="@string/menu_item_theme_toggle"
+        app:showAsAction="ifRoom"/>
+    
+
+
+</menu>

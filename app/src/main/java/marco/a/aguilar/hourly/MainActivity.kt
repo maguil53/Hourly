@@ -5,6 +5,9 @@ import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
@@ -22,6 +25,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        setSupportActionBar(findViewById(R.id.my_toolbar))
 
         mainFragmentAdapter = MainFragmentAdapter(this)
         viewPager = findViewById(R.id.pager)
@@ -71,5 +76,25 @@ class MainActivity : AppCompatActivity() {
             }
 
         }.attach()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main, menu)
+
+        menu?.findItem(R.id.action_recovery)?.icon?.let {
+            DrawableCompat.setTint(
+                it,
+                ContextCompat.getColor(this, R.color.white)
+            )
+        }
+
+        menu?.findItem(R.id.action_theme_toggle)?.icon?.let {
+            DrawableCompat.setTint(
+                it,
+                ContextCompat.getColor(this, R.color.white)
+            )
+        }
+
+        return super.onCreateOptionsMenu(menu)
     }
 }
