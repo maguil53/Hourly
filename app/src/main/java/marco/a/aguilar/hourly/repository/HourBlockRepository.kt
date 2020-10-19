@@ -36,6 +36,33 @@ class HourBlockRepository {
         val hour3TaskList: List<Task> = listOf(hour3Task1, hour3Task2, hour3Task3)
         val hour3 = HourBlock(3, 3, hour3TaskList)
 
-        return listOf(hour1, hour2, hour3)
+        val hour4 = HourBlock(4, 4, hour3TaskList)
+        val hour5 = HourBlock(5, 5, hour3TaskList)
+        val hour6 = HourBlock(6, 6, hour3TaskList)
+        val hour7 = HourBlock(7, 7, hour3TaskList)
+        val hour8 = HourBlock(8, 8, hour3TaskList)
+        val hour9 = HourBlock(9, 9, hour3TaskList)
+        val hour10 = HourBlock(10, 10, hour3TaskList)
+        val hour11 = HourBlock(11, 11, hour3TaskList)
+        val hour12 = HourBlock(12, 12, hour3TaskList)
+        val hour13 = HourBlock(13, 13, hour3TaskList)
+        val hour14 = HourBlock(14, 14, hour3TaskList)
+        val hour15 = HourBlock(15, 15, hour3TaskList)
+        val hour16 = HourBlock(16, 16, hour3TaskList)
+        val hour17 = HourBlock(17, 17, hour3TaskList)
+        val hour18 = HourBlock(18, 18, hour3TaskList)
+        val hour19 = HourBlock(19, 19, hour3TaskList)
+        val hour20 = HourBlock(20, 20, hour3TaskList)
+        val hour21 = HourBlock(21, 21, hour3TaskList)
+        val hour22 = HourBlock(22, 22, hour3TaskList)
+        val hour23 = HourBlock(23, 23, hour3TaskList)
+        val hour24 = HourBlock(24, 24, hour3TaskList)
+
+
+        return listOf(hour1, hour2, hour3, hour4, hour5, hour6,
+            hour7, hour8, hour9, hour10, hour11, hour12,
+            hour13, hour14, hour15, hour16, hour17,
+            hour18, hour19, hour20, hour21, hour22,
+            hour23, hour24)
     }
 }
