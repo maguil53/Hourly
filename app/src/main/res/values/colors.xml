@@ -6,6 +6,8 @@
 
     <color name="backgroundColor">#272727</color>
 
+    <color name="tasksBorderColor">#313131</color>
+
     <color name="colorLightGrey">#D6D6D6</color>
     <color name="colorDarkGrey">#838383</color>
     <color name="white">#FFFFFF</color>

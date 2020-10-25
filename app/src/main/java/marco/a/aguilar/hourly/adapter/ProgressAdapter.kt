@@ -25,7 +25,7 @@ class ProgressAdapter(private val hourBlocks: List<HourBlock>) :
     }
 
     override fun onBindViewHolder(holder: ProgressViewHolder, position: Int) {
-        holder.itemView.text_view_progress_hour.text = (hourBlocks[position].time).toString()
+        holder.itemView.textview_progress_hour.text = (hourBlocks[position].time).toString()
     }
 
     override fun getItemCount() = hourBlocks.size

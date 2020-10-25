@@ -33,7 +33,7 @@ class ProgressFragment : Fragment() {
         val calendar: Calendar = Calendar.getInstance()
 
         /**
-         * @4:16 the value for calendar.get(Calendar.HOUR_OF_DAY) was 16.
+         * @4:16pm the value for calendar.get(Calendar.HOUR_OF_DAY) was 16.
          * This means the value could be from 1-24
          */
         Log.d(TAG, "onCreateView: Calendar.Hour: " + calendar.get(Calendar.HOUR_OF_DAY))
