@@ -20,8 +20,8 @@ class HourBlockRepository {
 
     private fun generateHourBlocks(): List<HourBlock> {
         // Creating fake hour blocks
-        val hour1Task1 = Task(TaskType.WORK, "Do homework")
-        val hour1Task2 = Task(TaskType.WORK, "Take out the trash")
+        val hour1Task1 = Task(TaskType.WORK, "Do homework", true)
+        val hour1Task2 = Task(TaskType.WORK, "Take out the trash", true)
         val hour1TaskList: List<Task> = listOf(hour1Task1, hour1Task2)
         val hour1 = HourBlock(1, 1, hour1TaskList)
 
