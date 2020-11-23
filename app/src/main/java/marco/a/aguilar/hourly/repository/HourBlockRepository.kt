@@ -20,19 +20,24 @@ class HourBlockRepository {
 
     private fun generateHourBlocks(): List<HourBlock> {
         // Creating fake hour blocks
-        val hour1Task1 = Task(TaskType.WORK, "Do homework", true)
-        val hour1Task2 = Task(TaskType.WORK, "Take out the trash", true)
+        /**
+         * Creating fake hour blocks.
+         * For now we'll need to specify Task ID but once we start adding Tasks
+         * to our database we'll use the auto-generate property to create the Task IDs
+         */
+        val hour1Task1 = Task(1, TaskType.WORK, "Do homework", 1, true)
+        val hour1Task2 = Task(2, TaskType.WORK, "Take out the trash", 1, true)
         val hour1TaskList: List<Task> = listOf(hour1Task1, hour1Task2)
         val hour1 = HourBlock(1, 1, hour1TaskList)
 
-        val hour2Task1 = Task(TaskType.WORK, "Go for a run")
-        val hour2Task2 = Task(TaskType.WORK, "Take a shower")
+        val hour2Task1 = Task(3, TaskType.WORK, "Go for a run", 2)
+        val hour2Task2 = Task(4, TaskType.WORK, "Take a shower", 2)
         val hour2TaskList: List<Task> = listOf(hour2Task1, hour2Task2)
         val hour2 = HourBlock(2, 2, hour2TaskList)
 
-        val hour3Task1 = Task(TaskType.WORK, "Eat some food")
-        val hour3Task2 = Task(TaskType.WORK, "Meditate")
-        val hour3Task3 = Task(TaskType.WORK, "Watch anime!")
+        val hour3Task1 = Task(5, TaskType.WORK, "Eat some food", 3)
+        val hour3Task2 = Task(6, TaskType.WORK, "Meditate", 3)
+        val hour3Task3 = Task(7, TaskType.WORK, "Watch anime!", 3)
         val hour3TaskList: List<Task> = listOf(hour3Task1, hour3Task2, hour3Task3)
         val hour3 = HourBlock(3, 3, hour3TaskList)
 
