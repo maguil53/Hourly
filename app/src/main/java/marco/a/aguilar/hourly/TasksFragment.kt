@@ -45,7 +45,7 @@ class TasksFragment : Fragment() {
             it.forEach { hourBlock ->
                 Log.d(ContentValues.TAG, "onViewCreated: hourBlock#${hourBlock.time} tasks: ")
 
-                hourBlock.taskList.forEach {task ->
+                hourBlock.tasks?.forEach {task ->
                     Log.d(ContentValues.TAG, "\tTask Decription: ${task.description}")
                 }
             }

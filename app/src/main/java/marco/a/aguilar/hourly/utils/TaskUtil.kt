@@ -8,11 +8,10 @@ class TaskUtil {
 
     companion object {
         fun calculateIsComplete(hourBlock: HourBlock): Boolean {
-            val tasks = hourBlock.taskList
+            val tasks = hourBlock.tasks
             var isComplete = false;
 
-            // This is so clean!!
-            isComplete = tasks.all { isComplete }
+            isComplete = tasks?.all { isComplete }!!
 
             tasks.forEach {
                 Log.d(TAG, "calculateIsComplete: taskdescription ${it.description}")

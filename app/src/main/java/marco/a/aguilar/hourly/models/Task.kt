@@ -3,7 +3,9 @@ package marco.a.aguilar.hourly.models
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 import marco.a.aguilar.hourly.enums.TaskType
+import marco.a.aguilar.hourly.persistence.Converters
 
 @Entity(tableName = "tasks")
 data class Task(

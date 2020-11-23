@@ -55,7 +55,7 @@ class ProgressFragment : Fragment() {
             it.forEach { hourBlock ->
                 Log.d(TAG, "onViewCreated: hourBlock#${hourBlock.time} tasks: ")
 
-                hourBlock.taskList.forEach {task ->
+                hourBlock.tasks?.forEach {task ->
                     Log.d(TAG, "\tTask Decription: ${task.description}")
                 }
             }
