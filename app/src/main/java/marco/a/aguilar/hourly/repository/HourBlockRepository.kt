@@ -1,24 +1,61 @@
 package marco.a.aguilar.hourly.repository
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import marco.a.aguilar.hourly.enums.TaskType
 import marco.a.aguilar.hourly.models.HourBlock
 import marco.a.aguilar.hourly.models.Task
+import marco.a.aguilar.hourly.persistence.AppDatabase
 
-class HourBlockRepository {
+/**
+ * The "object" keyword treats this class like a Singleton. So now we don't
+ * have to call HourBlockRepository(), instead we retrieve the single instance
+ * of this class by calling HourBlockRepository. This implementation is also
+ * thread-safe.
+ *
+ * https://kotlinlang.org/docs/reference/object-declarations.html#object-declarations
+ * https://blog.mindorks.com/how-to-create-a-singleton-class-in-kotlin
+ * https://medium.com/swlh/singleton-class-in-kotlin-c3398e7fd76b
+ *
+ * Problem, I want to pass the context to the Repository but it doesn't seem like
+ * there's a way to do this with the "object" keyword. (There's probably a way to do
+ * this but for now I'm going to go with what I know)
+ *
+ * TODO()
+ *  1) Prepopulate database
+ *  2) Change Line 52 so that it doesn't use generateHourBlocks() anymore
+ */
+class HourBlockRepository private constructor(context: Context) {
+    
+    private val database = AppDatabase.getInstance(context)
+
+    companion object {
+        private var instance: HourBlockRepository? = null
+
+        fun getInstance(context: Context): HourBlockRepository {
+            return instance ?: HourBlockRepository(context)
+        }
+
+    }
 
     fun getHourBlocks(): LiveData<List<HourBlock>> {
 
         val hourBlocks = MutableLiveData<List<HourBlock>>()
 
-        // wow, I think I just needed to do ".value"
-        hourBlocks.value = generateHourBlocks()
+        /**
+         * So our issue now is that database.hourBlockDao().getHourBlocks().value
+         * is returning a null value. Obviously this will happen because
+         * we have nothing in our database the first time we open it.
+         * So what we have to do now is Prepopulate our database
+         */
+        hourBlocks.value = database.hourBlockDao().getHourBlocks().value ?: generateFakeHourBlocks()
+
 
         return hourBlocks
     }
 
-    private fun generateHourBlocks(): List<HourBlock> {
+    private fun generateFakeHourBlocks(): List<HourBlock> {
         // Creating fake hour blocks
         /**
          * Creating fake hour blocks.

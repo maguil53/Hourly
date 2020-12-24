@@ -1,28 +1,50 @@
 package marco.a.aguilar.hourly
 
 import android.content.ContentValues.TAG
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import marco.a.aguilar.hourly.adapter.ProgressAdapter
 import marco.a.aguilar.hourly.viewmodel.ProgressViewModel
-import java.util.*
-import kotlin.math.log
 
+import java.util.*
+
+
+@RequiresApi(Build.VERSION_CODES.N)
 class ProgressFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
 
-    private val viewModel: ProgressViewModel by viewModels()
+
+    /**
+     * One way to delay creation of the viewModel until an appropriate lifecycle method is to use
+     * lazy. This requires that viewModel not be referenced before onActivityCreated, which we
+     * do in this Fragment.
+     */
+
+    private val viewModel: ProgressViewModel by lazy {
+
+        val activity = requireNotNull(this.activity) {
+            "You can only access the viewmodel after onActivityCreted()"
+        }
+
+        ViewModelProvider(this, ProgressViewModel.ProgressViewModelFactory(activity.application))
+            .get(ProgressViewModel::class.java)
+    }
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
