@@ -14,7 +14,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import marco.a.aguilar.hourly.adapter.ProgressAdapter
 import marco.a.aguilar.hourly.adapter.TasksAdapter
+import marco.a.aguilar.hourly.models.HourBlock
 import marco.a.aguilar.hourly.viewmodel.TasksViewModel
 
 import java.util.*
@@ -62,20 +64,23 @@ class TasksFragment : Fragment() {
         viewModel.hourBlocks.observe(viewLifecycleOwner) {
             // Update Hour blocks (AKA RecyclerView)
             Log.d(ContentValues.TAG, "onViewCreated: Updating UI because of hourBlocks")
-            it.forEach { hourBlock ->
-                Log.d(ContentValues.TAG, "onViewCreated: hourBlock#${hourBlock.time} tasks: ")
-
-                hourBlock.tasks?.forEach {task ->
-                    Log.d(ContentValues.TAG, "\tTask Decription: ${task.description}")
-                }
-            }
+//            it.forEach { hourBlock ->
+//                Log.d(ContentValues.TAG, "onViewCreated: hourBlock#${hourBlock.time} tasks: ")
+//
+//                hourBlock.tasks?.forEach {task ->
+//                    Log.d(ContentValues.TAG, "\tTask Decription: ${task.description}")
+//                }
+//            }
         }
     }
 
     fun initRecyclerView(view: View) {
 
         viewManager = LinearLayoutManager(activity)
-        viewAdapter = TasksAdapter(viewModel.hourBlocks.value!!)
+        var dummyBlocks = viewModel.hourBlocks.value ?: HourBlock.generateFakeHourBlocks()
+//        viewAdapter = TasksAdapter(viewModel.hourBlocks.value!!)
+        viewAdapter = TasksAdapter(dummyBlocks)
+
 
         recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_tasks).apply {
             // use this setting to improve performance if you know that changes

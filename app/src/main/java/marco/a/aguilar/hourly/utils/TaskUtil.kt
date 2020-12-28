@@ -7,6 +7,10 @@ import marco.a.aguilar.hourly.models.HourBlock
 class TaskUtil {
 
     companion object {
+        /**
+         * hourBlock.tasks could potentially be null because at the beginnig of the
+         * app we have nothing
+         */
         fun calculateIsComplete(hourBlock: HourBlock): Boolean {
             val tasks = hourBlock.tasks
             var isComplete = false;
