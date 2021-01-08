@@ -20,5 +20,5 @@ interface HourBlockDao {
     fun getHourBlocks(): LiveData<List<HourBlock>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAllEmptyBlocks(hourBlocks: List<HourBlock>)
+    suspend fun insertAllEmptyBlocks(hourBlocks: List<HourBlock>)
 }

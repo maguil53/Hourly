@@ -173,6 +173,10 @@ class ProgressViewModel(
      */
     class ProgressViewModelFactory(private val application: Application): ViewModelProvider.Factory {
 
+        /**
+         * This must be the Factory method that created our "Product"
+         * (Head First Design Patterns Ch 4 page 134)
+         */
         override fun <T: ViewModel?> create(modelClass: Class<T>): T {
             if(modelClass.isAssignableFrom(ProgressViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")

@@ -2,7 +2,7 @@ package marco.a.aguilar.hourly.utils
 
 /**
  * A reusable class used to create a Singleton that requires an argument.
- *
+ *      https://bladecoder.medium.com/kotlin-singletons-with-argument-194ef06edd9e
  * Explanation behind Volatile and synchronized can be found here:
  *  https://developer.android.com/codelabs/kotlin-android-training-room-database#5
  */
