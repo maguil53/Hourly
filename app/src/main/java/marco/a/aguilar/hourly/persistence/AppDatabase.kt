@@ -1,18 +1,21 @@
 package marco.a.aguilar.hourly.persistence
 
+import android.content.ContentValues.TAG
 import android.content.Context
+import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.sqlite.db.SupportSQLiteDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import marco.a.aguilar.hourly.models.HourBlock
 import marco.a.aguilar.hourly.models.Task
+import marco.a.aguilar.hourly.utils.SingletonHolder
 
-/**
- * This class seems to require a bit more of a set up so
- * that's why I'm not using the "object" keyword.
- * Also more importantly abstract classes can't be instantiated.
- */
 @Database(entities = [HourBlock::class, Task::class], version = 1)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -20,20 +23,25 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun hourBlockDao(): HourBlockDao
     abstract fun taskDao(): TaskDao
 
-    companion object {
+    companion object : SingletonHolder<AppDatabase, Context>({
+        Room.databaseBuilder(it.applicationContext, AppDatabase::class.java, "hourly_db")
+                .addCallback(object : RoomDatabase.Callback() {
 
-        private const val DATABASE_NAME: String = "hourly_db"
-        private var instance: AppDatabase? = null
+                    override fun onCreate(db: SupportSQLiteDatabase) {
+                        super.onCreate(db)
+                        Log.d(TAG, "onCreate: Database created...calling callback")
 
-        /**
-         * Not exactly sure if this is how you do it but I used these sources to help me out:
-         * https://github.com/mitchtabian/Local-db-Cache-Retrofit-REST-API-MVVM/blob/setting-widgets-properties/app/src/main/java/com/codingwithmitch/foodrecipes/persistence/RecipeDatabase.java
-         * https://github.com/android/sunflower/blob/main/app/src/main/java/com/google/samples/apps/sunflower/data/AppDatabase.kt
-         */
-        fun getInstance(context: Context): AppDatabase {
-            return instance ?: Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME).build()
-        }
-    }
-
-
+                        /**
+                         * Yaaaay, we did this using Coroutines instead! Used suspend keyword in HourBlockDao.
+                         * Thanks to this article, I understood Coroutines better:
+                         *      https://medium.com/androiddevelopers/coroutines-on-android-part-i-getting-the-background-3e0e54d20bb
+                         */
+                        GlobalScope.launch {
+                            withContext(Dispatchers.IO) {
+                                AppDatabase.getInstance(it.applicationContext).hourBlockDao().insertAllEmptyBlocks(HourBlock.prepopulateHourBlocks())
+                            }
+                        }
+                    }
+                }).build()
+    })
 }

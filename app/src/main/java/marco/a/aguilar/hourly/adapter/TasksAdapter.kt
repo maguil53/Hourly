@@ -11,7 +11,7 @@ import marco.a.aguilar.hourly.R
 import marco.a.aguilar.hourly.models.HourBlock
 import marco.a.aguilar.hourly.utils.TaskUtil
 
-class TasksAdapter(private val hourBlocks: List<HourBlock>) :
+class TasksAdapter(private var hourBlocks: List<HourBlock>) :
         RecyclerView.Adapter<TasksAdapter.TasksViewHolder>() {
 
     /**
@@ -41,4 +41,9 @@ class TasksAdapter(private val hourBlocks: List<HourBlock>) :
     }
 
     override fun getItemCount() = hourBlocks.size
+
+    fun setHourBlocks(newHourBlocks: List<HourBlock>) {
+        hourBlocks = newHourBlocks
+        notifyDataSetChanged()
+    }
 }

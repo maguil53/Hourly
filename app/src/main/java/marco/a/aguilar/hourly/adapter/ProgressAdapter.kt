@@ -8,7 +8,7 @@ import kotlinx.android.synthetic.main.progress_item.view.*
 import marco.a.aguilar.hourly.R
 import marco.a.aguilar.hourly.models.HourBlock
 
-class ProgressAdapter(private val hourBlocks: List<HourBlock>) :
+class ProgressAdapter(private var hourBlocks: List<HourBlock>) :
     RecyclerView.Adapter<ProgressAdapter.ProgressViewHolder>() {
 
     class ProgressViewHolder(private val progressItem: View): RecyclerView.ViewHolder(progressItem)
@@ -29,4 +29,10 @@ class ProgressAdapter(private val hourBlocks: List<HourBlock>) :
     }
 
     override fun getItemCount() = hourBlocks.size
+
+
+    fun setHourBlocks(newHourBlocks: List<HourBlock>) {
+        hourBlocks = newHourBlocks
+        notifyDataSetChanged()
+    }
 }

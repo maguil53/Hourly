@@ -1,9 +1,8 @@
-package marco.a.aguilar.hourly.viewmodel
+    package marco.a.aguilar.hourly.viewmodel
 
 import android.app.Application
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
+import kotlinx.coroutines.launch
 import marco.a.aguilar.hourly.models.HourBlock
 import marco.a.aguilar.hourly.repository.HourBlockRepository
 
@@ -23,24 +22,26 @@ import marco.a.aguilar.hourly.repository.HourBlockRepository
  */
 class ProgressViewModel(
     application: Application
-): ViewModel() {
+): AndroidViewModel(application) {
 
-    private val repository: HourBlockRepository = HourBlockRepository.getInstance(application)
-
-    val hourBlocks: LiveData<List<HourBlock>> = repository.getHourBlocks()
-
+    private val repository: HourBlockRepository = HourBlockRepository.getInstance(getApplication())
+    var hourBlocks: LiveData<List<HourBlock>> = repository.getHourBlocks()
 
     /**
      * Factory for constructing ProgressViewModel with "application" parameter
      */
     class ProgressViewModelFactory(private val application: Application): ViewModelProvider.Factory {
 
+        /**
+         * This must be the Factory method that created our "Product"
+         * (Head First Design Patterns Ch 4 page 134)
+         */
         override fun <T: ViewModel?> create(modelClass: Class<T>): T {
             if(modelClass.isAssignableFrom(ProgressViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
                 return ProgressViewModel(application) as T
             }
-            throw IllegalArgumentException("Unable to construct viewmodel")
+            throw IllegalArgumentException("Unable to construct ViewModel")
         }
 
     }

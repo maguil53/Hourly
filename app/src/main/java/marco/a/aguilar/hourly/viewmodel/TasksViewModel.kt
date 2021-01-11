@@ -2,6 +2,7 @@ package marco.a.aguilar.hourly.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import marco.a.aguilar.hourly.models.HourBlock
@@ -12,8 +13,7 @@ class TasksViewModel(
 ): ViewModel() {
 
     private val repository: HourBlockRepository = HourBlockRepository.getInstance(application)
-
-    val hourBlocks: LiveData<List<HourBlock>> = repository.getHourBlocks()
+    var hourBlocks: LiveData<List<HourBlock>> = repository.getHourBlocks()
 
     /**
      * Factory for constructing TasksViewModel with "application" parameter
