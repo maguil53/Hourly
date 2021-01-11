@@ -26,7 +26,7 @@ import java.util.*
 class TasksFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var viewAdapter: RecyclerView.Adapter<*>
+    private lateinit var viewAdapter: TasksAdapter
     private lateinit var viewManager: RecyclerView.LayoutManager
 
     /**
@@ -35,7 +35,6 @@ class TasksFragment : Fragment() {
      * do in this Fragment.
      */
     private val viewModel: TasksViewModel by lazy {
-
         val activity = requireNotNull(this.activity) {
             "You can only access the viewmodel after onActivityCreted()"
         }
@@ -62,23 +61,14 @@ class TasksFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.hourBlocks.observe(viewLifecycleOwner) {
-            // Update Hour blocks (AKA RecyclerView)
-            Log.d(ContentValues.TAG, "onViewCreated: Updating UI because of hourBlocks")
-//            it.forEach { hourBlock ->
-//                Log.d(ContentValues.TAG, "onViewCreated: hourBlock#${hourBlock.time} tasks: ")
-//
-//                hourBlock.tasks?.forEach {task ->
-//                    Log.d(ContentValues.TAG, "\tTask Decription: ${task.description}")
-//                }
-//            }
+            viewAdapter.setHourBlocks(it)
         }
     }
 
     fun initRecyclerView(view: View) {
 
         viewManager = LinearLayoutManager(activity)
-        var dummyBlocks = viewModel.hourBlocks.value ?: HourBlock.generateFakeHourBlocks()
-//        viewAdapter = TasksAdapter(viewModel.hourBlocks.value!!)
+        val dummyBlocks = viewModel.hourBlocks.value ?: HourBlock.generateFakeHourBlocks()
         viewAdapter = TasksAdapter(dummyBlocks)
 
 

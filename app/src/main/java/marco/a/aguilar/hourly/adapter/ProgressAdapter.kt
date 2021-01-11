@@ -33,7 +33,6 @@ class ProgressAdapter(private var hourBlocks: List<HourBlock>) :
 
     fun setHourBlocks(newHourBlocks: List<HourBlock>) {
         hourBlocks = newHourBlocks
-
         notifyDataSetChanged()
     }
 }

@@ -15,13 +15,7 @@ import kotlinx.coroutines.withContext
 import marco.a.aguilar.hourly.models.HourBlock
 import marco.a.aguilar.hourly.models.Task
 import marco.a.aguilar.hourly.utils.SingletonHolder
-import java.util.concurrent.Executors
 
-/**
- * This class seems to require a bit more of a set up so
- * that's why I'm not using the "object" keyword.
- * Also more importantly abstract classes can't be instantiated.
- */
 @Database(entities = [HourBlock::class, Task::class], version = 1)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -48,10 +42,6 @@ abstract class AppDatabase : RoomDatabase() {
                             }
                         }
                     }
-
                 }).build()
     })
-
-
-
 }

@@ -36,7 +36,6 @@ data class HourBlock(
    constructor(blockId: Int, time: Int, isComplete: Boolean) : this(blockId, time, isComplete, null){
    }
 
-
    companion object {
       /**
        * For our Progress view we're going to have to check if tasks is null first,
@@ -61,13 +60,11 @@ data class HourBlock(
          )
       }
 
+      /**
+       * For now we'll need to specify Task ID but once we start adding Tasks
+       * to our database we'll use the auto-generate property to create the Task IDs
+       */
       fun generateFakeHourBlocks(): List<HourBlock> {
-         // Creating fake hour blocks
-         /**
-          * Creating fake hour blocks.
-          * For now we'll need to specify Task ID but once we start adding Tasks
-          * to our database we'll use the auto-generate property to create the Task IDs
-          */
          val hour1Task1 = Task(1, TaskType.WORK, "Do homework", 1, true)
          val hour1Task2 = Task(2, TaskType.WORK, "Take out the trash", 1, true)
          val hour1TaskList: List<Task> = listOf(hour1Task1, hour1Task2)

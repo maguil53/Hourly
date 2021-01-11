@@ -13,37 +13,7 @@ class TasksViewModel(
 ): ViewModel() {
 
     private val repository: HourBlockRepository = HourBlockRepository.getInstance(application)
-
-    /**
-     * Having this line like this will crash the app, but that's fine because otherwise
-     * it WON'T create the database, the question is, why?
-     */
-    var hourBlocks: LiveData<List<HourBlock>> = MutableLiveData<List<HourBlock>>()
-
-    init {
-
-        /**
-         * For some odd reason, this plus the 2 other lines above call my database to be created!!!
-         */
-
-        hourBlocks  = repository.getHourBlocks()
-
-
-    }
-
-    /**
-     * But writing it like this won't call onCreate in the database
-            var hourBlocks = MutableLiveData<List<HourBlock>>()
-
-            init {
-
-                viewModelScope.launch {
-                    hourBlocks.value = repository.getHourBlocks().value
-                }
-
-
-            }
-     */
+    var hourBlocks: LiveData<List<HourBlock>> = repository.getHourBlocks()
 
     /**
      * Factory for constructing TasksViewModel with "application" parameter
