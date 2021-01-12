@@ -13,7 +13,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginBottom="5dp"
-        android:background="@color/colorDarkGrey" />
+        android:background="@drawable/hour_block_background_limbo" />
 
     <TextView
         android:id="@+id/textview_progress_hour"

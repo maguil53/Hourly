@@ -29,6 +29,12 @@ abstract class AppDatabase : RoomDatabase() {
 
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
+                        /**
+                         * Todo:
+                         *  1) Check if onCreate callback is called more than once if we close the app
+                         *  and open it again. I'm worried that once we start saving information our
+                         *  database will get wiped.
+                         */
                         Log.d(TAG, "onCreate: Database created...calling callback")
 
                         /**

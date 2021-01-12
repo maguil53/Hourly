@@ -57,7 +57,10 @@ class ProgressFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.hourBlocks.observe(viewLifecycleOwner) {
-            viewAdapter.setHourBlocks(it)
+            /**
+             * For testing purposes only (HourBlock Color). Uncomment when you're done
+             */
+//            viewAdapter.setHourBlocks(it)
         }
     }
 

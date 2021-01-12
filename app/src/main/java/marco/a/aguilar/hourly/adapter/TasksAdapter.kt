@@ -32,8 +32,6 @@ class TasksAdapter(private var hourBlocks: List<HourBlock>) :
 
     override fun onBindViewHolder(holder: TasksViewHolder, position: Int) {
 
-        Log.d(TAG, "onBindViewHolder: position: $position")
-
         val block = hourBlocks[position]
 
         holder.itemView.textview_tasks_number.text = "No Tasks"
