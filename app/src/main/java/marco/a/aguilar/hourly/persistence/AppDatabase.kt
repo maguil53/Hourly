@@ -45,6 +45,12 @@ abstract class AppDatabase : RoomDatabase() {
                         GlobalScope.launch {
                             withContext(Dispatchers.IO) {
                                 AppDatabase.getInstance(it.applicationContext).hourBlockDao().insertAllEmptyBlocks(HourBlock.prepopulateHourBlocks())
+
+                                /**
+                                 * Todo(): Delete Later. For now we're just using this
+                                 * until we implement a way to generate tasks for an HourBlock
+                                 */
+                                // AppDatabase.getInstance(it.applicationContext).taskDao().insertDummyTasks(Task.generateDummyTasks())
                             }
                         }
                     }

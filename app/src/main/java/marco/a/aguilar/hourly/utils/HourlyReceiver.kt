@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import marco.a.aguilar.hourly.models.Task
 import marco.a.aguilar.hourly.persistence.AppDatabase
 
 private const val TAG = "HourlyReceiver"
@@ -42,14 +43,27 @@ class HourlyReceiver : BroadcastReceiver() {
          * We're going to check if all tasks have isComplete set to True.
          * Once we finish doing this, then we'll pass this onto
          *      AppDatabase.getInstance(context).hourBlockDao().updateHourBlock(isComplete, nextHour - 1)
+         *
+         *
+         * CRAP I JUST REALIZED WE CAN'T CONTINUE UNTIL WE HAVE OUR TASKS TABLE SET UP!!!
+         * Why? Because we don't store Tasks in our hour_blocks table. So we need to use
+         * the nextHour - 1 id to get all the Tasks and then do our stuff....wait this might be kinda easy
          */
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
-                /**
-                 * We're subtracting 1 from nextHour because this will give us the hour
-                 * that just finished, which is the one we're trying to evaluate.
-                 */
-                AppDatabase.getInstance(context).hourBlockDao().updateHourBlock(nextHour - 1)
+                Log.d(TAG, "onReceive: Broadcast Received")
+
+                val database = AppDatabase.getInstance(context)
+
+                // Evaluate HourBlock that just passed
+                val evaluatedHourBlockId = nextHour - 1
+                Log.d(TAG, "onReceive: evaluatedHourBlock: $evaluatedHourBlockId")
+                
+                val tasks: List<Task> = database.taskDao().getTasksForHourBlock(evaluatedHourBlockId)
+                var hourBlockIsComplete = Task.checkIfAllTasksAreComplete(tasks)
+
+                // hourBlockIsComplete will determine the color of the square
+                database.hourBlockDao().updateIsComplete(hourBlockIsComplete, evaluatedHourBlockId)
             }
         }
 

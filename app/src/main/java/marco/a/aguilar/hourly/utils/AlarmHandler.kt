@@ -24,11 +24,16 @@ class AlarmHandler(val context: Context) {
     fun setAlarm() {
         alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        // Set the alarm to start at next hour
         /**
          * Set the alarm to start at next hour.
          *  Ex: If it's 2:45pm, Alarm will start at 3pm and should
-         *  update HourBlock for Hour 2
+         *  update HourBlock for Hour 2.
+         *
+         * Why? Because if the user is starting their day at 8:30am, you don't want
+         * the Alarm to be triggered immediately. Since not having the "+1" will
+         * mean the alarm should execute at 8:00am, which it will once the user opens
+         * the app. Not only that, but it will keep executing our alarm if the user
+         * keeps opening and closing the app. This is why we need the +1 in nextHour
          */
         val calendar: Calendar = Calendar.getInstance().apply {
             timeInMillis = System.currentTimeMillis()
