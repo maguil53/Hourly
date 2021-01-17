@@ -1,7 +1,9 @@
 package marco.a.aguilar.hourly
 
+import android.content.ContentValues.TAG
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -57,10 +59,7 @@ class ProgressFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.hourBlocks.observe(viewLifecycleOwner) {
-            /**
-             * For testing purposes only (HourBlock Color). Uncomment when you're done
-             */
-//            viewAdapter.setHourBlocks(it)
+            viewAdapter.setHourBlocks(it)
         }
     }
 
@@ -68,7 +67,13 @@ class ProgressFragment : Fragment() {
     fun initRecyclerView(view: View) {
         viewManager = GridLayoutManager(activity, 4)
 
-        viewAdapter = ProgressAdapter(HourBlock.generateFakeHourBlocks())
+        /**
+         * These will be temporary HourBlocks that will just show Grey
+         * squares (According to our logic inside Progress Adapter) while the
+         * database gets set for the first time.
+         */
+        viewAdapter = ProgressAdapter(HourBlock.generateBlankHourBlocks())
+
 
         recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_progress).apply {
             // use this setting to improve performance if you know that changes

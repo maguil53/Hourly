@@ -1,12 +1,10 @@
 package marco.a.aguilar.hourly.adapter
 
 import android.content.ContentValues.TAG
-import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.progress_item.view.*
 import marco.a.aguilar.hourly.R

@@ -15,4 +15,15 @@ interface HourBlockDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllEmptyBlocks(hourBlocks: List<HourBlock>)
+
+    /**
+     * Apparently SQLite doesn't have a boolean data type. Room maps
+     * 1 to true, and 0 to false
+     */
+    @Query("UPDATE hour_blocks SET is_complete = 1 WHERE block_id = :block_id")
+    suspend fun updateHourBlock(block_id: Int)
+
+
+    @Query("UPDATE hour_blocks SET is_complete = :is_complete WHERE block_id = :block_id")
+    suspend fun updateIsComplete(is_complete: Boolean, block_id: Int)
 }

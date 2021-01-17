@@ -16,6 +16,8 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.activity_main.*
 import marco.a.aguilar.hourly.utils.AlarmHandler
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
     private lateinit var mainFragmentAdapter: MainFragmentAdapter
@@ -37,7 +39,6 @@ class MainActivity : AppCompatActivity() {
         mainFragmentAdapter = MainFragmentAdapter(this)
         viewPager = findViewById(R.id.pager)
         viewPager.adapter = mainFragmentAdapter
-
 
         // Attach tab_layout
         /**
@@ -105,7 +106,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun initHourlyAlarm() {
-        val alarmHandler: AlarmHandler = AlarmHandler(this)
+        val alarmHandler = AlarmHandler(this)
 
         // Cancel previous alarms (if any)
         alarmHandler.cancelAlarm()

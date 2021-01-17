@@ -2,44 +2,52 @@ package marco.a.aguilar.hourly.utils
 
 import android.app.AlarmManager
 import android.app.PendingIntent
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import java.util.*
 
 class AlarmHandler(val context: Context) {
-    /**
-     * Todo(): Set Alarm at a time further away from you
-     */
 
     private var alarmManager: AlarmManager? = null
     private var alarmIntent: PendingIntent
+    private val nextHour: Int = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + 1
 
     init {
-        alarmIntent = Intent(context, HourlyReceiver::class.java).let { intent ->
-            /**
-             * Just for fun, here's some more info on "let"
-             * https://stackoverflow.com/questions/58606651/what-is-the-purpose-of-let-keyword-in-kotlin
-             */
-            PendingIntent.getBroadcast(context, 0, intent, 0)
-        }
+        val intent = Intent(context, HourlyReceiver::class.java)
+        intent.putExtra("nextHour", nextHour)
+
+        alarmIntent = PendingIntent.getBroadcast(context, 0 , intent, 0)
     }
 
     fun setAlarm() {
         alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        // Set the alarm to start at 2:00 a.m.
+        // Set the alarm to start at next hour
+        /**
+         * Set the alarm to start at next hour.
+         *  Ex: If it's 2:45pm, Alarm will start at 3pm and should
+         *  update HourBlock for Hour 2
+         */
         val calendar: Calendar = Calendar.getInstance().apply {
             timeInMillis = System.currentTimeMillis()
-            set(Calendar.HOUR_OF_DAY, 2)
-            set(Calendar.MINUTE, 27)
+
+            Log.d(ContentValues.TAG, "AlarmHandler: Next Hour Coming up: $nextHour")
+
+            set(Calendar.HOUR_OF_DAY, nextHour)
+            set(Calendar.MINUTE, 0)
         }
 
-        // setRepeating() lets you specify a precise custom interval--in this case,
-        // 20 minutes.
+        /**
+         * setRepeating() helps specify a custom interval in this case, every Hour
+         *
+         * Formula: 1000 * 60 * mins
+         */
         alarmManager?.setRepeating(
             AlarmManager.RTC_WAKEUP,
             calendar.timeInMillis,
-            1000 * 60 * 20,
+            1000 * 60 * 60,
             alarmIntent
         )
     }
@@ -52,9 +60,5 @@ class AlarmHandler(val context: Context) {
         // If the alarm has been set, cancel it.
         alarmManager?.cancel(alarmIntent)
     }
-
-
-
-
 
 }
