@@ -2,10 +2,12 @@ package marco.a.aguilar.hourly
 
 import android.content.ContentValues.TAG
 import android.graphics.Color
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
@@ -13,12 +15,14 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.activity_main.*
+import marco.a.aguilar.hourly.utils.AlarmHandler
 
 class MainActivity : AppCompatActivity() {
     private lateinit var mainFragmentAdapter: MainFragmentAdapter
     private lateinit var viewPager: ViewPager2
 
     companion object {
+        @RequiresApi(Build.VERSION_CODES.N)
         val fragmentList: ArrayList<Fragment> = arrayListOf(ProgressFragment(), TasksFragment())
     }
 
@@ -27,6 +31,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
+
+        initHourlyAlarm()
 
         mainFragmentAdapter = MainFragmentAdapter(this)
         viewPager = findViewById(R.id.pager)
@@ -96,5 +102,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         return super.onCreateOptionsMenu(menu)
+    }
+
+    fun initHourlyAlarm() {
+        val alarmHandler: AlarmHandler = AlarmHandler(this)
+
+        // Cancel previous alarms (if any)
+        alarmHandler.cancelAlarm()
+
+        // Set new alarm
+        alarmHandler.setAlarm()
     }
 }

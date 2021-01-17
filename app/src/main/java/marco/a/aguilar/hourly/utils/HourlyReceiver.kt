@@ -10,18 +10,15 @@ private const val TAG = "HourlyReceiver"
 
 class HourlyReceiver : BroadcastReceiver() {
 
-
+    /**
+     * The alarm is being sent and the Log is being printed.
+     * The Toast didn't work well for testing purposes because
+     * it didn't let me know if the alarm was still being sent even if the
+     * phone was off (it was!)
+     */
     override fun onReceive(context: Context, intent: Intent) {
 
-        // For Testing purposes only
-        StringBuilder().apply {
-            append("Action: ${intent.action}\n")
-            append("URI: ${intent.toUri(Intent.URI_INTENT_SCHEME)}\n")
-            toString().also { log ->
-                Log.d(TAG, log)
-                Toast.makeText(context, log, Toast.LENGTH_LONG).show()
-            }
-        }
+        Log.d(TAG, "onReceive: Called...")
 
     }
 }
