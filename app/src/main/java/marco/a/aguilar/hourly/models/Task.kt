@@ -1,7 +1,5 @@
 package marco.a.aguilar.hourly.models
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -12,7 +10,7 @@ data class Task(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "task_id") var taskId: Int,
     var type: TaskType, // Might have to create Converter for this column
     var description: String,
-    @ColumnInfo(name = "block_id") var blockId: Int, // Which Block it belongs to
+    @ColumnInfo(name = "task_block_id") var taskBlockId: Int, // Which Block it belongs to
     @ColumnInfo(name = "is_complete") var isComplete: Boolean = false
 ) {
 
