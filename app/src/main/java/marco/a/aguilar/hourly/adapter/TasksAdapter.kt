@@ -9,9 +9,10 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.tasks_item.view.*
 import marco.a.aguilar.hourly.R
 import marco.a.aguilar.hourly.models.HourBlock
+import marco.a.aguilar.hourly.models.TasksCompletedInfo
 import marco.a.aguilar.hourly.utils.TaskUtil
 
-class TasksAdapter(private var hourBlocks: List<HourBlock>) :
+class TasksAdapter(private var tasksCompletedInfo: List<TasksCompletedInfo>) :
         RecyclerView.Adapter<TasksAdapter.TasksViewHolder>() {
 
     /**
@@ -32,16 +33,17 @@ class TasksAdapter(private var hourBlocks: List<HourBlock>) :
 
     override fun onBindViewHolder(holder: TasksViewHolder, position: Int) {
 
-        val block = hourBlocks[position]
+        val totalComplete = tasksCompletedInfo[position].totalComplete
+        val blockId = tasksCompletedInfo[position].hourBlock.blockId
 
-        holder.itemView.textview_tasks_number.text = "No Tasks"
-        holder.itemView.textview_tasks_hour.text = "1am"
+        holder.itemView.textview_tasks_number.text = totalComplete.toString()
+        holder.itemView.textview_tasks_hour.text = blockId.toString()
     }
 
-    override fun getItemCount() = hourBlocks.size
+    override fun getItemCount() = tasksCompletedInfo.size
 
-    fun setHourBlocks(newHourBlocks: List<HourBlock>) {
-        hourBlocks = newHourBlocks
+    fun setTasksCompletedInfo(newTasksCompletedInfo: List<TasksCompletedInfo>) {
+        tasksCompletedInfo = newTasksCompletedInfo
         notifyDataSetChanged()
     }
 }

@@ -1,6 +1,7 @@
 package marco.a.aguilar.hourly
 
 import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -11,12 +12,19 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import marco.a.aguilar.hourly.adapter.ProgressAdapter
 import marco.a.aguilar.hourly.adapter.TasksAdapter
 import marco.a.aguilar.hourly.models.HourBlock
+import marco.a.aguilar.hourly.models.TasksCompletedInfo
+import marco.a.aguilar.hourly.persistence.AppDatabase
 import marco.a.aguilar.hourly.viewmodel.TasksViewModel
 
 import java.util.*
@@ -60,19 +68,39 @@ class TasksFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.hourBlocks.observe(viewLifecycleOwner) {
-            /**
-             * For testing purposes only (HourBlock Color). Uncomment when you're done
-             */
-//            viewAdapter.setHourBlocks(it)
+        viewModel.tasksCompletedInfoList.observe(viewLifecycleOwner) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+
+                    it.forEach { taskCompleteInfo ->
+                        var calculatedComplete = taskCompleteInfo.tasks?.sumBy { if(it.isComplete) 1 else 0 }
+                        calculatedComplete = calculatedComplete ?: 0
+
+                        taskCompleteInfo.totalComplete = calculatedComplete
+                    }
+
+                }
+
+                /**
+                 * Once we set totalComplete, we use Dispatchers.Main for our
+                 * CoroutineScope context so that we can update our UI on the Main Thread,
+                 * or else we'll get an error that says:
+                 *      "Only the original thread that created a view hierarchy can touch its views."
+                 */
+                withContext(Dispatchers.Main) {
+                    viewAdapter.setTasksCompletedInfo(it)
+                }
+            }
         }
+
+
     }
 
     fun initRecyclerView(view: View) {
 
         viewManager = LinearLayoutManager(activity)
-        val dummyBlocks = viewModel.hourBlocks.value ?: HourBlock.generateFakeHourBlocks()
-        viewAdapter = TasksAdapter(dummyBlocks)
+        val blankTasksCompletedInfo = viewModel.tasksCompletedInfoList.value ?: TasksCompletedInfo.generateBlankTasksCompletedInfo()
+        viewAdapter = TasksAdapter(blankTasksCompletedInfo)
 
 
         recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_tasks).apply {

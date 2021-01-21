@@ -61,9 +61,6 @@ class ProgressFragment : Fragment() {
         viewModel.hourBlocks.observe(viewLifecycleOwner) {
             viewAdapter.setHourBlocks(it)
         }
-
-        // Delete Later
-        viewModel.test()
     }
 
 

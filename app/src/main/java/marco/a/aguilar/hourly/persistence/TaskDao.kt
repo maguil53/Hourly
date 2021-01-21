@@ -2,9 +2,7 @@ package marco.a.aguilar.hourly.persistence
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import marco.a.aguilar.hourly.models.HourBlock
 import marco.a.aguilar.hourly.models.Task
-import marco.a.aguilar.hourly.models.TasksCompletedInfo2
 import marco.a.aguilar.hourly.models.TasksCompletedInfo
 
 @Dao
@@ -28,12 +26,10 @@ interface TaskDao {
     suspend fun insertDummyTasks(Task: List<Task>)
 
     /**
-     * This works, now try doing it with live data.
+     * This works.
      */
     @Transaction
     @Query("SELECT * FROM hour_blocks")
-    fun getTasksInfo(): List<TasksCompletedInfo>
+    fun getTasksInfo(): LiveData<List<TasksCompletedInfo>>
 
-//    @Query("SELECT count(CASE WHEN 'is_complete' THEN 1 END), count() from tasks ")
-//    fun getTasksCompletedInfo(): List<TasksCompletedInfo2>
 }
