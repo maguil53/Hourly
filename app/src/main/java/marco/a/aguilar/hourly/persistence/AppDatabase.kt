@@ -50,7 +50,7 @@ abstract class AppDatabase : RoomDatabase() {
                                  * Todo(): Delete Later. For now we're just using this
                                  * until we implement a way to generate tasks for an HourBlock
                                  */
-                                // AppDatabase.getInstance(it.applicationContext).taskDao().insertDummyTasks(Task.generateDummyTasks())
+                                 AppDatabase.getInstance(it.applicationContext).taskDao().insertDummyTasks(Task.generateDummyTasks())
                             }
                         }
                     }

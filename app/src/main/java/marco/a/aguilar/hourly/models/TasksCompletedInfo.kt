@@ -3,7 +3,7 @@ package marco.a.aguilar.hourly.models
 import androidx.room.Embedded
 import androidx.room.Relation
 
-data class TaskCompletedInfo (
+data class TasksCompletedInfo (
     @Embedded val hourBlock: HourBlock,
     @Relation(
         parentColumn = "block_id",

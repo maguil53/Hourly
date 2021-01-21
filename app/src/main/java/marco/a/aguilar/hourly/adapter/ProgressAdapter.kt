@@ -53,9 +53,9 @@ class ProgressAdapter(private var hourBlocks: List<HourBlock>) :
         // Log.d(TAG, "onCreateView: Calendar.Hour: " + calendar.get(Calendar.HOUR_OF_DAY))
 
         if((hour > hourBlocks[position].time)) {
-            Log.d(TAG, "onBindViewHolder: hour = $hour")
-            Log.d(TAG, "onBindViewHolder: hourBlocks[position].time = " + hourBlocks[position].time)
-            Log.d(TAG, "onBindViewHolder: isComplete value: " + hourBlocks[position].isComplete)
+//            Log.d(TAG, "onBindViewHolder: hour = $hour")
+//            Log.d(TAG, "onBindViewHolder: hourBlocks[position].time = " + hourBlocks[position].time)
+//            Log.d(TAG, "onBindViewHolder: isComplete value: " + hourBlocks[position].isComplete)
 
             /**
              * We only want to make a decision to change a Block color once the time has changed,

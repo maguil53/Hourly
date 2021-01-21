@@ -1,12 +1,11 @@
 package marco.a.aguilar.hourly.persistence
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import marco.a.aguilar.hourly.models.HourBlock
 import marco.a.aguilar.hourly.models.Task
+import marco.a.aguilar.hourly.models.TasksCompletedInfo2
+import marco.a.aguilar.hourly.models.TasksCompletedInfo
 
 @Dao
 interface TaskDao {
@@ -27,4 +26,14 @@ interface TaskDao {
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDummyTasks(Task: List<Task>)
+
+    /**
+     * This works, now try doing it with live data.
+     */
+    @Transaction
+    @Query("SELECT * FROM hour_blocks")
+    fun getTasksInfo(): List<TasksCompletedInfo>
+
+//    @Query("SELECT count(CASE WHEN 'is_complete' THEN 1 END), count() from tasks ")
+//    fun getTasksCompletedInfo(): List<TasksCompletedInfo2>
 }
