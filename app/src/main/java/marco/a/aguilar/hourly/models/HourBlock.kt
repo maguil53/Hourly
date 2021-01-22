@@ -77,6 +77,20 @@ data class HourBlock(
          )
       }
 
+      fun getTime(blockId: Int): String {
+         var time = ""
+
+         val hour = if(blockId % 12 == 0) 12 else (blockId % 12)
+         time += hour
+
+         time += when(blockId) {
+            in 12..23 -> " pm"
+            else -> " am"
+         }
+
+         return time
+      }
+
 
       /**
        * For now we'll need to specify Task ID but once we start adding Tasks

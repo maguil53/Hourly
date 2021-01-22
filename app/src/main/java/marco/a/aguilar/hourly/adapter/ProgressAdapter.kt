@@ -28,7 +28,9 @@ class ProgressAdapter(private var hourBlocks: List<HourBlock>) :
     }
 
     override fun onBindViewHolder(holder: ProgressViewHolder, position: Int) {
-        holder.itemView.textview_progress_hour.text = (hourBlocks[position].time).toString()
+
+//        holder.itemView.textview_progress_hour.text = (hourBlocks[position].time).toString()
+        holder.itemView.textview_progress_hour.text = HourBlock.getTime(hourBlocks[position].time)
 
         /**
          * Let's try changing the color here first. We can change this later depending on

@@ -69,16 +69,20 @@ class TasksFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.tasksCompletedInfoList.observe(viewLifecycleOwner) {
+            /**
+             * A coroutine used to calculate how many tasks are completed in an HourBlock. It
+             * just takes the list of tasks from taskCompleteInfo and counts the tasks that have
+             * isComplete set to true. Then it sets the final value to the instance variable,
+             * totalComplete.
+             */
             viewLifecycleOwner.lifecycleScope.launch {
                 withContext(Dispatchers.IO) {
-
                     it.forEach { taskCompleteInfo ->
                         var calculatedComplete = taskCompleteInfo.tasks?.sumBy { if(it.isComplete) 1 else 0 }
                         calculatedComplete = calculatedComplete ?: 0
 
                         taskCompleteInfo.totalComplete = calculatedComplete
                     }
-
                 }
 
                 /**
@@ -91,6 +95,7 @@ class TasksFragment : Fragment() {
                     viewAdapter.setTasksCompletedInfo(it)
                 }
             }
+
         }
 
 

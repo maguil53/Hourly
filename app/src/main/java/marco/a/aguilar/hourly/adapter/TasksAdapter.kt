@@ -33,11 +33,22 @@ class TasksAdapter(private var tasksCompletedInfo: List<TasksCompletedInfo>) :
 
     override fun onBindViewHolder(holder: TasksViewHolder, position: Int) {
 
-        val totalComplete = tasksCompletedInfo[position].totalComplete
+        val totalComplete = tasksCompletedInfo[position].totalComplete.toString()
         val blockId = tasksCompletedInfo[position].hourBlock.blockId
 
-        holder.itemView.textview_tasks_number.text = totalComplete.toString()
-        holder.itemView.textview_tasks_hour.text = blockId.toString()
+        val time = HourBlock.getTime(blockId)
+
+        // May be null
+        val hourBlockTasks = tasksCompletedInfo[position].tasks
+
+        val tasksDescription = if(hourBlockTasks != null && hourBlockTasks.isNotEmpty())
+                                    totalComplete + "/" + hourBlockTasks.size.toString() + " Complete"
+                                else "No Tasks"
+
+
+
+        holder.itemView.textview_tasks_number.text = tasksDescription
+        holder.itemView.textview_tasks_hour.text = time
     }
 
     override fun getItemCount() = tasksCompletedInfo.size
