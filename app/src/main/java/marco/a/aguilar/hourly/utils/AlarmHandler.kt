@@ -2,7 +2,6 @@ package marco.a.aguilar.hourly.utils
 
 import android.app.AlarmManager
 import android.app.PendingIntent
-import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -13,6 +12,7 @@ class AlarmHandler(val context: Context) {
     private var alarmManager: AlarmManager? = null
     private var alarmIntent: PendingIntent
     private val nextHour: Int = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + 1
+    private val TAG = "AlarmHandler"
 
     init {
         val intent = Intent(context, HourlyReceiver::class.java)
@@ -38,11 +38,11 @@ class AlarmHandler(val context: Context) {
         val calendar: Calendar = Calendar.getInstance().apply {
             timeInMillis = System.currentTimeMillis()
 
-            Log.d(ContentValues.TAG, "AlarmHandler: Next Hour Coming up: $nextHour")
-
             set(Calendar.HOUR_OF_DAY, nextHour)
             set(Calendar.MINUTE, 0)
         }
+
+        Log.d(TAG, "setAlarm: nextHour: $nextHour")
 
         /**
          * setRepeating() helps specify a custom interval in this case, every Hour

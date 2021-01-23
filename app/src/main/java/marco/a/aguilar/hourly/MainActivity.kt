@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onTabReselected(tab: TabLayout.Tab?) {
-                TODO("Not yet implemented")
+                // Do Nothing
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {

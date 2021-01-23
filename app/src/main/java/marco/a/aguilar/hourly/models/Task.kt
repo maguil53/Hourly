@@ -36,7 +36,15 @@ data class Task(
          *      to check all the tasks in an HourBlock
          */
         fun checkIfAllTasksAreComplete(tasks: List<Task>): Boolean {
-            return tasks.all { it.isComplete }
+            /**
+             * Return false if tasks is empty because tasks.all()
+             * will return true if the list is empty for some reason.
+             */
+            if(tasks.isNotEmpty()) {
+                tasks.all { it.isComplete }
+            }
+
+            return false
         }
 
         fun generateDummyTasks(): List<Task> {
