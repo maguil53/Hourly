@@ -2,6 +2,7 @@ package marco.a.aguilar.hourly
 
 import android.content.ContentValues
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -31,7 +32,7 @@ import java.util.*
 
 
 @RequiresApi(Build.VERSION_CODES.N)
-class TasksFragment : Fragment() {
+class TasksFragment : Fragment(), TasksAdapter.OnHourTasksListener {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewAdapter: TasksAdapter
@@ -105,7 +106,7 @@ class TasksFragment : Fragment() {
 
         viewManager = LinearLayoutManager(activity)
         val blankTasksCompletedInfo = viewModel.tasksCompletedInfoList.value ?: TasksCompletedInfo.generateBlankTasksCompletedInfo()
-        viewAdapter = TasksAdapter(blankTasksCompletedInfo)
+        viewAdapter = TasksAdapter(blankTasksCompletedInfo, this)
 
 
         recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_tasks).apply {
@@ -119,6 +120,21 @@ class TasksFragment : Fragment() {
             // specify an viewAdapter
             adapter = viewAdapter
         }
+    }
+
+    override fun onHourTasksClicked(position: Int) {
+        val tasksCompletedInfo = viewModel.tasksCompletedInfoList.value?.get(position)
+
+        val intent = Intent(activity, TaskCheckListActivity::class.java)
+
+        /**
+         * Passing the entire object because we're going to be using the HourBlock's id
+         * to save the list of Tasks to our Database.
+         */
+        if (tasksCompletedInfo != null)
+            intent.putExtra("Tasks", tasksCompletedInfo)
+
+        startActivity(intent)
     }
 
 }

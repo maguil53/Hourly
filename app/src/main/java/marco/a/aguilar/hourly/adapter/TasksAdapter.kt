@@ -10,9 +10,9 @@ import kotlinx.android.synthetic.main.tasks_item.view.*
 import marco.a.aguilar.hourly.R
 import marco.a.aguilar.hourly.models.HourBlock
 import marco.a.aguilar.hourly.models.TasksCompletedInfo
-import marco.a.aguilar.hourly.utils.TaskUtil
 
-class TasksAdapter(private var tasksCompletedInfo: List<TasksCompletedInfo>) :
+class TasksAdapter(private var tasksCompletedInfo: List<TasksCompletedInfo>,
+                   var mOnHourTasksListener: OnHourTasksListener) :
         RecyclerView.Adapter<TasksAdapter.TasksViewHolder>() {
 
     /**
@@ -20,15 +20,27 @@ class TasksAdapter(private var tasksCompletedInfo: List<TasksCompletedInfo>) :
      * Because technically these are still Hour Blocks, we're just showing
      * how many tasks it has.
      */
-    
-    class TasksViewHolder(private val tasksItem: View): RecyclerView.ViewHolder(tasksItem)
+    class TasksViewHolder(private val tasksItem: View, private val onHourTasksListener: OnHourTasksListener):
+        RecyclerView.ViewHolder(tasksItem), View.OnClickListener {
+
+        init {
+            tasksItem.setOnClickListener(this)
+        }
+
+        override fun onClick(itemView: View?) {
+            Log.d(TAG, "onClick: TasksViewHolder")
+
+            onHourTasksListener.onHourTasksClicked(adapterPosition)
+        }
+
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TasksViewHolder {
 
         val tasksItem = LayoutInflater.from(parent.context)
             .inflate(R.layout.tasks_item, parent, false)
 
-        return TasksViewHolder(tasksItem)
+        return TasksViewHolder(tasksItem, mOnHourTasksListener)
     }
 
     override fun onBindViewHolder(holder: TasksViewHolder, position: Int) {
@@ -45,8 +57,6 @@ class TasksAdapter(private var tasksCompletedInfo: List<TasksCompletedInfo>) :
                                     totalComplete + "/" + hourBlockTasks.size.toString() + " Complete"
                                 else "No Tasks"
 
-
-
         holder.itemView.textview_tasks_number.text = tasksDescription
         holder.itemView.textview_tasks_hour.text = time
     }
@@ -57,4 +67,9 @@ class TasksAdapter(private var tasksCompletedInfo: List<TasksCompletedInfo>) :
         tasksCompletedInfo = newTasksCompletedInfo
         notifyDataSetChanged()
     }
+
+    interface OnHourTasksListener {
+        fun onHourTasksClicked(position: Int)
+    }
+
 }

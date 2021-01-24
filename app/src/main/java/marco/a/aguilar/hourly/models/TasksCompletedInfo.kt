@@ -1,9 +1,12 @@
 package marco.a.aguilar.hourly.models
 
+import android.os.Parcelable
 import androidx.room.Embedded
 import androidx.room.Ignore
 import androidx.room.Relation
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 data class TasksCompletedInfo (
     @Embedded val hourBlock: HourBlock,
     @Relation(
@@ -12,7 +15,7 @@ data class TasksCompletedInfo (
     )
     val tasks: List<Task>?,
     @Ignore var totalComplete: Int = 0
-) {
+) : Parcelable {
 
     /**
      * Using this secondary constructor for getTasksInfo() in our TaskDao.kt.

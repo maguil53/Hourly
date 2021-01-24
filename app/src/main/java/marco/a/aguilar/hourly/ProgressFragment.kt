@@ -15,6 +15,7 @@ import androidx.lifecycle.observe
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import marco.a.aguilar.hourly.adapter.ProgressAdapter
+import marco.a.aguilar.hourly.adapter.TasksAdapter
 import marco.a.aguilar.hourly.models.HourBlock
 import marco.a.aguilar.hourly.viewmodel.ProgressViewModel
 

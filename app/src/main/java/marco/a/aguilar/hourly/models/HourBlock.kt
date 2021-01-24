@@ -1,19 +1,22 @@
 package marco.a.aguilar.hourly.models
 
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import kotlinx.android.parcel.Parcelize
 import marco.a.aguilar.hourly.enums.TaskType
 
 // Room tables are case-sensitive
+@Parcelize
 @Entity(tableName = "hour_blocks")
 data class HourBlock(
    @PrimaryKey @ColumnInfo(name = "block_id") var blockId: Int, // 1 - 24
    var time: Int, // 1 - 24
    @ColumnInfo(name = "is_complete") var isComplete: Boolean = false,
    @Ignore var tasks: List<Task>? = null
-) {
+) : Parcelable {
 
    /**
     * So the @Ignore annotation was giving me a lot of trouble but here's what I think
