@@ -7,14 +7,18 @@ import androidx.room.PrimaryKey
 import kotlinx.android.parcel.Parcelize
 import marco.a.aguilar.hourly.enums.TaskType
 
+/**
+ * AutoGenerate will take care of value for task_id, I put it at the end
+ * so we don't have to worry about that value when initializing a Task object.
+ */
 @Parcelize
 @Entity(tableName = "tasks")
 data class Task(
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "task_id") var taskId: Int,
     var type: TaskType, // Might have to create Converter for this column
     var description: String,
     @ColumnInfo(name = "task_block_id") var taskBlockId: Int, // Which Block it belongs to
-    @ColumnInfo(name = "is_complete") var isComplete: Boolean = false
+    @ColumnInfo(name = "is_complete") var isComplete: Boolean = false,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "task_id") var taskId: Int = 0
 ) : Parcelable {
 
     companion object {
@@ -52,9 +56,9 @@ data class Task(
 
         fun generateDummyTasks(): List<Task> {
             return listOf(
-                Task(99, TaskType.WORK, "Do the dishes",1, true),
-                Task(102, TaskType.WORK, "Work on Hourly",1, true),
-                Task(6, TaskType.WORK, "Watch Anime with the queen",1, false)
+                Task(TaskType.WORK, "Do the dishes",1, true),
+                Task(TaskType.WORK, "Work on Hourly",1, true),
+                Task(TaskType.WORK, "Watch Anime with the queen",1, false)
             )
         }
 

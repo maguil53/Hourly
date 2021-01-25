@@ -34,6 +34,8 @@ class TaskCheckListAdapter(private var mTasks: List<Task>)
 
         holder.itemView.textview_checklist_task_description.text = taskDescription
         holder.itemView.checkbox_checklist_task_iscomplete.isChecked = isComplete
+
+
     }
 
     override fun getItemCount() = mTasks.size
