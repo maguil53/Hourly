@@ -52,9 +52,9 @@ data class Task(
 
         fun generateDummyTasks(): List<Task> {
             return listOf(
-                Task(99, TaskType.WORK, "random",1, true),
-                Task(102, TaskType.WORK, "random",1, true),
-                Task(6, TaskType.WORK, "random",1, false)
+                Task(99, TaskType.WORK, "Do the dishes",1, true),
+                Task(102, TaskType.WORK, "Work on Hourly",1, true),
+                Task(6, TaskType.WORK, "Watch Anime with the queen",1, false)
             )
         }
 

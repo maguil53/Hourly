@@ -11,7 +11,7 @@ import marco.a.aguilar.hourly.R
 import marco.a.aguilar.hourly.models.HourBlock
 import marco.a.aguilar.hourly.models.TasksCompletedInfo
 
-class TasksAdapter(private var tasksCompletedInfo: List<TasksCompletedInfo>,
+class TasksAdapter(private var tasksCompletedInfoList: List<TasksCompletedInfo>,
                    var mOnHourTasksListener: OnHourTasksListener) :
         RecyclerView.Adapter<TasksAdapter.TasksViewHolder>() {
 
@@ -45,13 +45,13 @@ class TasksAdapter(private var tasksCompletedInfo: List<TasksCompletedInfo>,
 
     override fun onBindViewHolder(holder: TasksViewHolder, position: Int) {
 
-        val totalComplete = tasksCompletedInfo[position].totalComplete.toString()
-        val blockId = tasksCompletedInfo[position].hourBlock.blockId
+        val totalComplete = tasksCompletedInfoList[position].totalComplete.toString()
+        val blockId = tasksCompletedInfoList[position].hourBlock.blockId
 
         val time = HourBlock.getTime(blockId)
 
         // May be null
-        val hourBlockTasks = tasksCompletedInfo[position].tasks
+        val hourBlockTasks = tasksCompletedInfoList[position].tasks
 
         val tasksDescription = if(hourBlockTasks != null && hourBlockTasks.isNotEmpty())
                                     totalComplete + "/" + hourBlockTasks.size.toString() + " Complete"
@@ -61,10 +61,10 @@ class TasksAdapter(private var tasksCompletedInfo: List<TasksCompletedInfo>,
         holder.itemView.textview_tasks_hour.text = time
     }
 
-    override fun getItemCount() = tasksCompletedInfo.size
+    override fun getItemCount() = tasksCompletedInfoList.size
 
     fun setTasksCompletedInfo(newTasksCompletedInfo: List<TasksCompletedInfo>) {
-        tasksCompletedInfo = newTasksCompletedInfo
+        tasksCompletedInfoList = newTasksCompletedInfo
         notifyDataSetChanged()
     }
 

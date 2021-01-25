@@ -4,6 +4,8 @@
     <color name="colorPrimaryDark">#1F1F1F</color>
     <color name="colorAccent">#12ACE5</color>
 
+    <color name="colorAccentLight">#4dcfff</color>
+
     <color name="backgroundColor">#272727</color>
 
     <color name="tasksBorderColor">#313131</color>

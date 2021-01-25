@@ -105,8 +105,15 @@ class TasksFragment : Fragment(), TasksAdapter.OnHourTasksListener {
     fun initRecyclerView(view: View) {
 
         viewManager = LinearLayoutManager(activity)
-        val blankTasksCompletedInfo = viewModel.tasksCompletedInfoList.value ?: TasksCompletedInfo.generateBlankTasksCompletedInfo()
-        viewAdapter = TasksAdapter(blankTasksCompletedInfo, this)
+        /**
+         * I think this is what's causing the little stutter when swiping from ProgressFragment to
+         * TasksFragment. Instead, we're going to initialize our Adapter with some blank data, just
+         * so the transition is a little more smooth. Then our LiveData will update the UI when our
+         * List of TasksCompletedInfo is ready.
+         */
+//        val blankTasksCompletedInfo = viewModel.tasksCompletedInfoList.value ?: TasksCompletedInfo.generateBlankTasksCompletedInfo()
+//        viewAdapter = TasksAdapter(blankTasksCompletedInfo, this)
+        viewAdapter = TasksAdapter(TasksCompletedInfo.generateBlankTasksCompletedInfo(), this)
 
 
         recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_tasks).apply {
