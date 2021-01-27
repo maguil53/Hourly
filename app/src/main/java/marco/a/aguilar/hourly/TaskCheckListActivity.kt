@@ -30,7 +30,7 @@ class TaskCheckListActivity : AppCompatActivity(),
     private val TAG = "TaskCheckListActivity"
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var viewManager: RecyclerView.LayoutManager
+    private lateinit var viewManager: LinearLayoutManager
     private lateinit var viewAdapter: TaskCheckListAdapter
     private lateinit var mTasksCompletedInfo: TasksCompletedInfo
 
@@ -110,6 +110,10 @@ class TaskCheckListActivity : AppCompatActivity(),
 
         val stringValue: String = textView.text.toString()
 
+        recyclerView.post {
+            viewManager?.scrollToPosition(mTaskCheckItemList.size - 1)
+        }
+
         // setSelection() needs to come after requestFocus()
         editText.requestFocus()
         editText.setSelection(editText.text.length)
@@ -137,6 +141,9 @@ class TaskCheckListActivity : AppCompatActivity(),
             val oldString = textView.text.toString()
             val taskCheckItem = mTaskCheckItemList[position]
             val lastIndex = mTaskCheckItemList.size - 1
+
+            // Enable FAB again
+            fab_task_checklist.isEnabled = true
 
             if(finalString.isEmpty() && !recyclerView.isComputingLayout) {
 
@@ -169,6 +176,9 @@ class TaskCheckListActivity : AppCompatActivity(),
 
             // Clear text or else it'll append the text twice.
             editText.text.clear()
+        } else {
+            // Disable button to prevent users from clicking FAB while editing
+            fab_task_checklist.isEnabled = false
         }
 
     }
