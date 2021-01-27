@@ -14,10 +14,12 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.checklist_item.view.*
 import marco.a.aguilar.hourly.R
 import marco.a.aguilar.hourly.models.Task
+import marco.a.aguilar.hourly.models.TaskCheckItem
 
-class TaskCheckListAdapter(private var mTasks: List<Task>,
-                           private var mOnTaskTextViewClickedListener: OnTaskTextViewClickedListener)
+class TaskCheckListAdapter(private var mTaskCheckItemList: List<TaskCheckItem>,
+                           private var mOnTaskCheckItemInteractionListener: OnTaskCheckItemInteractionListener)
     : RecyclerView.Adapter<TaskCheckListAdapter.TaskCheckListViewHolder>() {
+
 
     class TaskCheckListViewHolder(private val taskItem: View) : RecyclerView.ViewHolder(taskItem) {
 
@@ -38,8 +40,8 @@ class TaskCheckListAdapter(private var mTasks: List<Task>,
         holder: TaskCheckListViewHolder,
         position: Int
     ) {
-        val taskDescription = mTasks[position].description
-        val isComplete = mTasks[position].isComplete
+        val taskDescription = mTaskCheckItemList[position].task.description
+        val isComplete = mTaskCheckItemList[position].task.isComplete
 
         holder.itemView.textview_checklist_task_description.text = taskDescription
         holder.itemView.checkbox_checklist_task_iscomplete.isChecked = isComplete
@@ -47,29 +49,43 @@ class TaskCheckListAdapter(private var mTasks: List<Task>,
         val taskDescriptionTextView: TextView = holder.itemView.textview_checklist_task_description
         val taskDescriptionEditText: EditText = holder.itemView.edittext_checklist_task_description
 
+
         taskDescriptionTextView.setOnClickListener {
-            mOnTaskTextViewClickedListener.onTaskTextViewClicked(taskDescriptionTextView, taskDescriptionEditText)
+            mOnTaskCheckItemInteractionListener.onTaskCheckItemClicked(taskDescriptionEditText,
+                taskDescriptionTextView, mTaskCheckItemList[position].isNewItem)
         }
 
         taskDescriptionEditText.setOnFocusChangeListener { view, hasFocus ->
-            if(!hasFocus) {
-                val finalEditText = view as EditText
-                val finalString = finalEditText.text.toString()
+            mOnTaskCheckItemInteractionListener.onTaskCheckItemFocusChanged(position, view as EditText,
+                taskDescriptionTextView, hasFocus)
+        }
 
-                taskDescriptionTextView.text = finalString
-
-                view.visibility = View.GONE
-                taskDescriptionTextView.visibility = View.VISIBLE
-                // Clear text or else it'll append the text twice.
-                view.text.clear()
-            }
+        /**
+         * Since we want to set the focus on the newly created item
+         */
+        if(mTaskCheckItemList[position].isNewItem) {
+            taskDescriptionTextView.performClick()
         }
 
     }
 
-    override fun getItemCount() = mTasks.size
+    override fun getItemCount() = mTaskCheckItemList.size
 
-    interface OnTaskTextViewClickedListener {
-        fun onTaskTextViewClicked(textView: TextView, editText: EditText)
+
+    interface OnTaskCheckItemInteractionListener {
+
+        /**
+         * Will be used to toggle between EditText and TextView (So Far)
+         */
+        fun onTaskCheckItemClicked(editText: EditText, textView: TextView, isNewItem: Boolean)
+
+        /**
+         * Will be used to check if the position of Item is the last one
+         * and if isNewItem is equal to true, if it is, then we change
+         * isNewItem to false in the TaskCheckItem List of our Activity and
+         * call notifyItemChanged(position)
+         */
+        fun onTaskCheckItemFocusChanged(position: Int, editText: EditText, textView: TextView, hasFocus: Boolean)
+
     }
 }
