@@ -167,10 +167,11 @@ class TaskCheckListActivity : AppCompatActivity(),
 
             textView.text = finalString
 
+            // This should go at the top
             editText.visibility = View.GONE
             textView.visibility = View.VISIBLE
 
-            // Clear text or else it'll append the text twice.
+            // Clear text once we are done using it.
             editText.text.clear()
         } else {
             // Disable button to prevent users from clicking FAB while editing
