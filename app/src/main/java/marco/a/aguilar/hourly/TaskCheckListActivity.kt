@@ -81,38 +81,35 @@ class TaskCheckListActivity : AppCompatActivity(),
         viewManager = LinearLayoutManager(this)
         viewAdapter = TaskCheckListAdapter(mTaskCheckItemList, this)
 
+        /**
+         * Okay, for some reason, if I scroll to position this way then it works.
+         * I think my issue was that the Adapter wasn't finished inserting the item and
+         * creating the UI fast enough (some kind of asynchronous issue). Some people
+         * suggested creating a delay before calling scrollToPosition() but I think
+         * using RecyclerView.AdapterDataObserver is better.
+         */
+        viewAdapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                recyclerView.scrollToPosition(viewAdapter.itemCount - 1)
+            }
+        })
+
+        /**
+         * The Scope Function apply() allows us to set the values for our
+         * recyclerView's member variables
+         */
         recyclerView = recycler_view_checklist.apply {
-            /**
-             * Not gonna use setHasFixedSize(true) since I'm not sure if our
-             * content will change since the user will be able to keep adding
-             * tasks
-             */
             layoutManager = viewManager
             adapter = viewAdapter
         }
     }
 
 
-    /**
-     * Todo: When the list of Tasks is too long, creating a new item won't immediately
-     * focus unless you scroll to it. So just scroll to that position.
-     *
-     * So far this is not working:
-     *  if(isNewItem) {
-     *      viewManager.scrollToPosition(mTaskCheckItemList.size - 1)
-     *  }
-     *
-     *  smoothScrollToPosition() isn't working either...
-     */
     override fun onTaskCheckItemClicked(editText: EditText, textView: TextView, isNewItem: Boolean) {
         editText.visibility = View.VISIBLE
         textView.visibility = View.GONE
 
         val stringValue: String = textView.text.toString()
-
-        recyclerView.post {
-            viewManager?.scrollToPosition(mTaskCheckItemList.size - 1)
-        }
 
         // setSelection() needs to come after requestFocus()
         editText.requestFocus()
@@ -126,7 +123,6 @@ class TaskCheckListActivity : AppCompatActivity(),
         // Might need to figure out a different way to do this since, toggle isn't really what we want.
         val imm = editText.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
         imm?.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
-
     }
 
     /**

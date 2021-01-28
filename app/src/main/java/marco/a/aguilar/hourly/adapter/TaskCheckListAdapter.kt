@@ -49,7 +49,6 @@ class TaskCheckListAdapter(private var mTaskCheckItemList: List<TaskCheckItem>,
         val taskDescriptionTextView: TextView = holder.itemView.textview_checklist_task_description
         val taskDescriptionEditText: EditText = holder.itemView.edittext_checklist_task_description
 
-
         taskDescriptionTextView.setOnClickListener {
             mOnTaskCheckItemInteractionListener.onTaskCheckItemClicked(taskDescriptionEditText,
                 taskDescriptionTextView, mTaskCheckItemList[position].isNewItem)
@@ -60,13 +59,10 @@ class TaskCheckListAdapter(private var mTaskCheckItemList: List<TaskCheckItem>,
                 taskDescriptionTextView, hasFocus)
         }
 
-        /**
-         * Since we want to set the focus on the newly created item
-         */
+        // Set focus on new item by performing click event.
         if(mTaskCheckItemList[position].isNewItem) {
             taskDescriptionTextView.performClick()
         }
-
     }
 
     override fun getItemCount() = mTaskCheckItemList.size
@@ -74,13 +70,11 @@ class TaskCheckListAdapter(private var mTaskCheckItemList: List<TaskCheckItem>,
 
     interface OnTaskCheckItemInteractionListener {
 
-        /**
-         * Will be used to toggle between EditText and TextView (So Far)
-         */
+        // Used to toggle between EditText and TextView
         fun onTaskCheckItemClicked(editText: EditText, textView: TextView, isNewItem: Boolean)
 
         /**
-         * Will be used to check if the position of Item is the last one
+         * Used to check if the position of Item is the last one
          * and if isNewItem is equal to true, if it is, then we change
          * isNewItem to false in the TaskCheckItem List of our Activity and
          * call notifyItemChanged(position)
