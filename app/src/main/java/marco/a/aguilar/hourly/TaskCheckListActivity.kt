@@ -22,6 +22,7 @@ import marco.a.aguilar.hourly.enums.TaskType
 import marco.a.aguilar.hourly.models.Task
 import marco.a.aguilar.hourly.models.TaskCheckItem
 import marco.a.aguilar.hourly.models.TasksCompletedInfo
+import marco.a.aguilar.hourly.repository.HourBlockRepository
 
 
 class TaskCheckListActivity : AppCompatActivity(),
@@ -32,14 +33,18 @@ class TaskCheckListActivity : AppCompatActivity(),
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewManager: LinearLayoutManager
     private lateinit var viewAdapter: TaskCheckListAdapter
-    private lateinit var mTasksCompletedInfo: TasksCompletedInfo
 
+    private lateinit var mTasksCompletedInfo: TasksCompletedInfo
     private var mTaskCheckItemList = mutableListOf<TaskCheckItem>()
+
+    private lateinit var mRepository: HourBlockRepository
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_task_check_list)
+
+        mRepository = HourBlockRepository.getInstance(this)
 
         // Not sure why we have to add !! if we already checked for null
         if(intent.extras != null) {
@@ -69,6 +74,10 @@ class TaskCheckListActivity : AppCompatActivity(),
                 viewAdapter.notifyItemInserted(mTaskCheckItemList.size - 1)
             }
         }
+
+        /**
+         * todo: Add a listener for each item's checkbox so we can mark it as complete
+         */
 
         initRecyclerView()
     }
@@ -133,73 +142,52 @@ class TaskCheckListActivity : AppCompatActivity(),
             var editTextContent = editText.text.toString().trim()
             val textViewContent = textView.text.toString()
             val taskCheckItem = mTaskCheckItemList[position]
-            val lastIndex = mTaskCheckItemList.size - 1
 
             enableFAB()
 
             /**
-             * Todo: Clean up your garbage code below.
-             * Once you clean it up, it'll be easier to figure out
-             * when we should use our repository to Update, Insert, or
-             * Delete an item from the DB.
-             *
-             * Todo: Test code after you clean it up.
-             *
-             * Wait, WHY THE FUCK ARE WE CHECKING IF AN ITEM IS NEW
-             * AND THEN BELOW WE'RE CHECKING IF IT'S NEW AND IF THE POSITION
-             * IS LAST...SEEMS REDUNDANT. BECAUSE IS NEWITEM SHOULD! TELL US
-             * THAT IT'S THE LASTINDEX, SO THERE'S NO NEED TO PASS "POSITION"
-             * TO THIS FUNCTION SINCE WE CAN JUST DO mTaskCheckItemList.last()
-             *
-             * 1) New AND string isEmpty (Delete from list, and notify RecView)
-             * 2) New AND string !isEmpty (Add to database)
-             * 3) Old AND string isEmpty (Leave as is, Nothing is called to the database)
-             * 4) Old AND string !isEmpty (Add to database)
-             *
-             * Seems like !recyclerView.isComputingLayout is being used for both cases so
-             * that should probably put at the top of the if statement
-             *
-             * Okay so we're going to need an Update and Add for now
+             * Okay so we're going to need an Update and Add function in our Dao
+             * for now. Worry about adding Delete when we add the swipe function.
+             * Also, if we add a delete button, we should make it perform a swipe
+             * action so that the user knows they can swipe to delete, like YouTube
+             * does when deleting a video from your playlist.
              *
              * If New, then we call Insert
              * If Old, then we call Update whether it's new or not
              * We might have to specify block_id or not
              */
-
             if(!recyclerView.isComputingLayout) {
                 when {
                     taskCheckItem.isNewItem -> {
                         if(editTextContent.isEmpty()) {
-                            // Do nothing, just delete it from the list and notify RecView
+                            // Do nothing in DB, just delete it from list and notify RV
                             mTaskCheckItemList.remove(taskCheckItem)
-                            viewAdapter.notifyItemRemoved(lastIndex)
+                            viewAdapter.notifyItemRemoved(mTaskCheckItemList.lastIndex)
                         } else {
-                            // Insert into database with block_id
-                            mTaskCheckItemList[lastIndex].isNewItem = false
-                            mTaskCheckItemList[lastIndex].task.description = editTextContent
-                            viewAdapter.notifyItemChanged(lastIndex)
+                            // Put new item's content into textView
+                            textView.text = editTextContent
+
+                            taskCheckItem.isNewItem = false
+                            taskCheckItem.task.description = editTextContent
+
+                            // block_id is assigned when we create the task so we can just insert
+                            insertTask(taskCheckItem.task)
+
+                            viewAdapter.notifyItemChanged(mTaskCheckItemList.lastIndex)
                         }
                     }
                     // Old item
                     !taskCheckItem.isNewItem -> {
-                        if(editTextContent.isEmpty()) {
-                            // We do nothing too, including not updating DB
-                            editTextContent = textViewContent
-                        } else {
+                        if(editTextContent.isNotEmpty() && editTextContent != textViewContent) {
+                            textView.text = editTextContent
+                            taskCheckItem.task.description = editTextContent
 
-                            if(editTextContent != textViewContent) {
-                                // Perform update with block_id
-                                textView.text = editTextContent
-                            }
+                            updateTask(taskCheckItem.task)
                         }
                     }
+
                 }
             }
-
-            // This might cause our app to crash since we have removed the reference
-            // Should only occur if New and NOT empty, otherwise leave the textView value alone
-            // OR if Old AND NOT empty
-            textView.text = editTextContent
 
             // This should go at the top
             editText.visibility = View.GONE
@@ -208,7 +196,6 @@ class TaskCheckListActivity : AppCompatActivity(),
             // Clear text once we are done using it.
             editText.text.clear()
         } else {
-            // Disable button to prevent users from clicking FAB while editing
             disableFAB()
         }
 
@@ -260,6 +247,14 @@ class TaskCheckListActivity : AppCompatActivity(),
     fun enableFAB(): Unit {
         fab_task_checklist.isEnabled = true
         fab_task_checklist.visibility = View.VISIBLE
+    }
+
+    fun updateTask(updatedTask: Task) {
+        mRepository.updateTask(updatedTask)
+    }
+
+    fun insertTask(newTask: Task) {
+        mRepository.insertTask(newTask)
     }
 
     /**

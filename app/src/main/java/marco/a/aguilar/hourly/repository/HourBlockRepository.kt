@@ -2,7 +2,12 @@ package marco.a.aguilar.hourly.repository
 
 import android.content.Context
 import androidx.lifecycle.LiveData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import marco.a.aguilar.hourly.models.HourBlock
+import marco.a.aguilar.hourly.models.Task
 import marco.a.aguilar.hourly.models.TasksCompletedInfo
 import marco.a.aguilar.hourly.persistence.AppDatabase
 
@@ -26,5 +31,21 @@ class HourBlockRepository private constructor(context: Context) {
 
     fun getTasksCompletedInfo(): LiveData<List<TasksCompletedInfo>> {
         return tasksCompletedInfo
+    }
+
+    fun updateTask(task: Task) {
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                database.taskDao().updateTask(task)
+            }
+        }
+    }
+
+    fun insertTask(task: Task) {
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                database.taskDao().insertTask(task)
+            }
+        }
     }
 }

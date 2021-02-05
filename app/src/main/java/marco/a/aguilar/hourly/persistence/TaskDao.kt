@@ -23,9 +23,13 @@ interface TaskDao {
      * until we implement a way to generate tasks for an HourBlock
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertDummyTasks(Task: List<Task>)
+    suspend fun insertDummyTasks(tasks: List<Task>)
 
+    @Update
+    suspend fun updateTask(task: Task)
 
+    @Insert
+    suspend fun insertTask(task: Task)
 
     /**
      * This works.
