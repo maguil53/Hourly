@@ -139,7 +139,7 @@ class TasksFragment : Fragment(), TasksAdapter.OnHourTasksListener {
          * to save the list of Tasks to our Database.
          */
         if (tasksCompletedInfo != null)
-            intent.putExtra("Tasks", tasksCompletedInfo)
+            intent.putExtra("TasksCompletedInfo", tasksCompletedInfo)
 
         startActivity(intent)
     }

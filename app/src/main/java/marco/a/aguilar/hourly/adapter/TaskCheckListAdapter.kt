@@ -58,25 +58,6 @@ class TaskCheckListAdapter(private var mTaskCheckItemList: List<TaskCheckItem>,
                 taskDescriptionTextView, hasFocus)
         }
 
-        /**
-         * Steps To Reproduce Bug:
-         *      1) Keep adding items until you're able to scroll
-         *      2) Scroll down to newest item
-         *      3) Click FAB
-         *      4) Don't enter anything and remove focus
-         *      5) Scroll up and you'll see that the first item is gone
-         *
-         * Notes: The contents are still there in OldString, because if we focus
-         * and then remove focus, then the old text will reappear.
-         *
-         * FIXED:
-         *      I believe this occurred because the RecyclerView recycles views and the
-         *      view from the empty new deleted item was being used for our old items,
-         *      which is why the EditText for the old view had the Visibility set to
-         *      VISIBLE
-         *
-         * Going to add this comment to our commit for learning purposes.
-         */
         if(!isNewTaskCheckItem) {
             taskDescriptionTextView.visibility = View.VISIBLE
             taskDescriptionEditText.visibility = View.GONE

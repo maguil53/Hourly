@@ -43,7 +43,7 @@ class TaskCheckListActivity : AppCompatActivity(),
 
         // Not sure why we have to add !! if we already checked for null
         if(intent.extras != null) {
-            mTasksCompletedInfo = intent.getParcelableExtra("Tasks")!!
+            mTasksCompletedInfo = intent.getParcelableExtra("TasksCompletedInfo")!!
 
             if(mTasksCompletedInfo.tasks != null) {
                 mTaskCheckItemList = mTasksCompletedInfo.tasks!!.map {
@@ -52,13 +52,10 @@ class TaskCheckListActivity : AppCompatActivity(),
             }
         }
 
-
         setSupportActionBar(findViewById(R.id.my_toolbar))
         // Get a support ActionBar corresponding to this toolbar and enable the Up button
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-
-        // Only 15 items are allowed
         fab_task_checklist.setOnClickListener {
             val blockId = mTasksCompletedInfo.hourBlock.blockId
 
@@ -138,8 +135,22 @@ class TaskCheckListActivity : AppCompatActivity(),
             val taskCheckItem = mTaskCheckItemList[position]
             val lastIndex = mTaskCheckItemList.size - 1
 
-            // Enable FAB again
-            fab_task_checklist.isEnabled = true
+            enableFAB()
+
+            /**
+             * Todo: Clean up your garbage code below.
+             * Once you clean it up, it'll be easier to figure out
+             * when we should use our repository to Update, Insert, or
+             * Delete an item from the DB.
+             *
+             * Todo: Test code after you clean it up.
+             *
+             * Wait, WHY THE FUCK ARE WE CHECKING IF AN ITEM IS NEW
+             * AND THEN BELOW WE'RE CHECKING IF IT'S NEW AND IF THE POSITION
+             * IS LAST...SEEMS REDUNDANT. BECAUSE IS NEWITEM SHOULD! TELL US
+             * THAT IT'S THE LASTINDEX, SO THERE'S NO NEED TO PASS "POSITION"
+             * TO THIS FUNCTION SINCE WE CAN JUST DO mTaskCheckItemList.last()
+             */
 
             if(finalString.isEmpty() && !recyclerView.isComputingLayout) {
 
@@ -175,7 +186,7 @@ class TaskCheckListActivity : AppCompatActivity(),
             editText.text.clear()
         } else {
             // Disable button to prevent users from clicking FAB while editing
-            fab_task_checklist.isEnabled = false
+            disableFAB()
         }
 
     }
@@ -216,6 +227,16 @@ class TaskCheckListActivity : AppCompatActivity(),
             view = View(activity)
         }
         imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    fun disableFAB(): Unit {
+        fab_task_checklist.isEnabled = false
+        fab_task_checklist.visibility = View.GONE
+    }
+
+    fun enableFAB(): Unit {
+        fab_task_checklist.isEnabled = true
+        fab_task_checklist.visibility = View.VISIBLE
     }
 
     /**

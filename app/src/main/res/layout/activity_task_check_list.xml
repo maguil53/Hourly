@@ -37,5 +37,18 @@
         android:focusable="true"
         android:clickable="true"/>
 
+    <!--
+        It's the Entire Layout that's being push up,
+        not just the FAB. This will make it easier to
+        implement Notion's keyboard button thing. Since
+        we just have to toggle VISIBLE and GONE.
+    -->
+<!--    <TextView-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_alignParentStart="true"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        android:text="Hell WOrld" />-->
+
 
 </RelativeLayout>
