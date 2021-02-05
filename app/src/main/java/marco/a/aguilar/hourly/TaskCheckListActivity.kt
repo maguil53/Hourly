@@ -130,8 +130,8 @@ class TaskCheckListActivity : AppCompatActivity(),
     override fun onTaskCheckItemFocusChanged(position: Int, editText: EditText, textView: TextView, hasFocus: Boolean) {
 
         if(!hasFocus) {
-            var finalString = editText.text.toString().trim()
-            val oldString = textView.text.toString()
+            var editTextContent = editText.text.toString().trim()
+            val textViewContent = textView.text.toString()
             val taskCheckItem = mTaskCheckItemList[position]
             val lastIndex = mTaskCheckItemList.size - 1
 
@@ -150,33 +150,56 @@ class TaskCheckListActivity : AppCompatActivity(),
              * IS LAST...SEEMS REDUNDANT. BECAUSE IS NEWITEM SHOULD! TELL US
              * THAT IT'S THE LASTINDEX, SO THERE'S NO NEED TO PASS "POSITION"
              * TO THIS FUNCTION SINCE WE CAN JUST DO mTaskCheckItemList.last()
+             *
+             * 1) New AND string isEmpty (Delete from list, and notify RecView)
+             * 2) New AND string !isEmpty (Add to database)
+             * 3) Old AND string isEmpty (Leave as is, Nothing is called to the database)
+             * 4) Old AND string !isEmpty (Add to database)
+             *
+             * Seems like !recyclerView.isComputingLayout is being used for both cases so
+             * that should probably put at the top of the if statement
+             *
+             * Okay so we're going to need an Update and Add for now
+             *
+             * If New, then we call Insert
+             * If Old, then we call Update whether it's new or not
+             * We might have to specify block_id or not
              */
 
-            if(finalString.isEmpty() && !recyclerView.isComputingLayout) {
+            if(!recyclerView.isComputingLayout) {
+                when {
+                    taskCheckItem.isNewItem -> {
+                        if(editTextContent.isEmpty()) {
+                            // Do nothing, just delete it from the list and notify RecView
+                            mTaskCheckItemList.remove(taskCheckItem)
+                            viewAdapter.notifyItemRemoved(lastIndex)
+                        } else {
+                            // Insert into database with block_id
+                            mTaskCheckItemList[lastIndex].isNewItem = false
+                            mTaskCheckItemList[lastIndex].task.description = editTextContent
+                            viewAdapter.notifyItemChanged(lastIndex)
+                        }
+                    }
+                    // Old item
+                    !taskCheckItem.isNewItem -> {
+                        if(editTextContent.isEmpty()) {
+                            // We do nothing too, including not updating DB
+                            editTextContent = textViewContent
+                        } else {
 
-                // If new item is empty, delete it
-                if(taskCheckItem.isNewItem) {
-                    mTaskCheckItemList.remove(taskCheckItem)
-                    viewAdapter.notifyItemRemoved(lastIndex)
-
-                    // I think we should return here since there's not much else we should do
-                    return
-                } else {
-                    finalString = oldString
+                            if(editTextContent != textViewContent) {
+                                // Perform update with block_id
+                                textView.text = editTextContent
+                            }
+                        }
+                    }
                 }
             }
 
-            // If the new item isn't empty, add it to our list and mark it as old.
-            if(taskCheckItem.isNewItem && position == lastIndex) {
-                mTaskCheckItemList[lastIndex].isNewItem = false
-                // Don't forget to set the new description.
-                mTaskCheckItemList[lastIndex].task.description = finalString
-
-                if(!recyclerView.isComputingLayout)
-                    viewAdapter.notifyItemChanged(lastIndex)
-            }
-
-            textView.text = finalString
+            // This might cause our app to crash since we have removed the reference
+            // Should only occur if New and NOT empty, otherwise leave the textView value alone
+            // OR if Old AND NOT empty
+            textView.text = editTextContent
 
             // This should go at the top
             editText.visibility = View.GONE
