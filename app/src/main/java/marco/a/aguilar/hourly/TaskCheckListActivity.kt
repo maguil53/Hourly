@@ -14,6 +14,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_task_check_list.*
@@ -108,6 +109,10 @@ class TaskCheckListActivity : AppCompatActivity(),
             layoutManager = viewManager
             adapter = viewAdapter
         }
+
+        // Used for swiping left to delete
+        val simpleCallback = getItemTouchHelperSimpleCallback()
+        ItemTouchHelper(simpleCallback).attachToRecyclerView(recyclerView)
     }
 
 
@@ -201,14 +206,13 @@ class TaskCheckListActivity : AppCompatActivity(),
 
     }
 
-    // This doesn't work
+
     override fun onBackPressed() {
         super.onBackPressed()
 
         hideKeyboard(this)
     }
 
-    // This doesn't work
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
@@ -220,7 +224,6 @@ class TaskCheckListActivity : AppCompatActivity(),
         return super.onOptionsItemSelected(item)
     }
 
-    // This doesn't work
     override fun onStop() {
         super.onStop()
         Log.d(TAG, "onStop: Calling onStop")
@@ -286,4 +289,27 @@ class TaskCheckListActivity : AppCompatActivity(),
 
         return super.dispatchTouchEvent(event)
     }
+
+    /**
+     * Implementing Swipe left to delete with ItemTouchHelper.SimpleCallback
+     */
+    fun getItemTouchHelperSimpleCallback(): ItemTouchHelper.SimpleCallback {
+        return object: ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean {
+                    // We don't want to do anything here
+                    return false
+                }
+
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    mTaskCheckItemList.removeAt(viewHolder.adapterPosition)
+                    viewAdapter.notifyItemRemoved(viewHolder.adapterPosition)
+                }
+            }
+    }
+
+
 }
