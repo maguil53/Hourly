@@ -111,7 +111,7 @@ class TaskCheckListActivity : AppCompatActivity(),
         }
 
         // Used for swiping left to delete
-        val simpleCallback = getItemTouchHelperSimpleCallback()
+        val simpleCallback = getItemTouchHelperSimpleCallback(this)
         ItemTouchHelper(simpleCallback).attachToRecyclerView(recyclerView)
     }
 
@@ -150,17 +150,6 @@ class TaskCheckListActivity : AppCompatActivity(),
 
             enableFAB()
 
-            /**
-             * Okay so we're going to need an Update and Add function in our Dao
-             * for now. Worry about adding Delete when we add the swipe function.
-             * Also, if we add a delete button, we should make it perform a swipe
-             * action so that the user knows they can swipe to delete, like YouTube
-             * does when deleting a video from your playlist.
-             *
-             * If New, then we call Insert
-             * If Old, then we call Update whether it's new or not
-             * We might have to specify block_id or not
-             */
             if(!recyclerView.isComputingLayout) {
                 when {
                     taskCheckItem.isNewItem -> {
@@ -293,20 +282,24 @@ class TaskCheckListActivity : AppCompatActivity(),
     /**
      * Implementing Swipe left to delete with ItemTouchHelper.SimpleCallback
      */
-    fun getItemTouchHelperSimpleCallback(): ItemTouchHelper.SimpleCallback {
+    private fun getItemTouchHelperSimpleCallback(context: Context): ItemTouchHelper.SimpleCallback {
         return object: ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
                 override fun onMove(
                     recyclerView: RecyclerView,
                     viewHolder: RecyclerView.ViewHolder,
                     target: RecyclerView.ViewHolder
                 ): Boolean {
-                    // We don't want to do anything here
                     return false
                 }
 
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    val deletedTask = mTaskCheckItemList[viewHolder.adapterPosition].task
+                    mRepository.deleteTask(deletedTask)
+
                     mTaskCheckItemList.removeAt(viewHolder.adapterPosition)
                     viewAdapter.notifyItemRemoved(viewHolder.adapterPosition)
+
+                    Toast.makeText(context, "Task removed", Toast.LENGTH_SHORT).show()
                 }
             }
     }

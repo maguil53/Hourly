@@ -31,6 +31,9 @@ interface TaskDao {
     @Insert
     suspend fun insertTask(task: Task)
 
+    @Delete
+    suspend fun deleteTask(task: Task)
+
     /**
      * This works.
      */
