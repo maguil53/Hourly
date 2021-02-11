@@ -22,6 +22,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"/>
 
+    <!--   Visibility = Gone is just for testing purposes-->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_task_checklist"
         android:layout_width="wrap_content"
@@ -34,21 +35,56 @@
         android:tint="@color/colorPrimaryDark"
         android:layout_margin="20dp"
         app:srcCompat="@drawable/ic_baseline_add_24"
+        android:visibility="gone"
         android:focusable="true"
         android:clickable="true"/>
 
-    <!--
-        It's the Entire Layout that's being push up,
-        not just the FAB. This will make it easier to
-        implement Notion's keyboard button thing. Since
-        we just have to toggle VISIBLE and GONE.
-    -->
-<!--    <TextView-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_alignParentStart="true"-->
-<!--        android:layout_alignParentBottom="true"-->
-<!--        android:text="Hell WOrld" />-->
+
+    <LinearLayout
+        android:layout_above="@id/fab_task_checklist"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:weightSum="2"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true">
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.MaterialComponents.Button.Icon"
+            android:theme="@style/Theme.MaterialComponents"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            app:cornerRadius="0dp"
+            android:layout_height="match_parent"
+            app:backgroundTint="@color/tasksBorderColor"
+            app:rippleColor="@color/keyboardButtonRippleColor"
+            android:insetBottom="0dp"
+            android:insetTop="0dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/keyboardButtonBorderColor"/>
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.MaterialComponents.Button.Icon"
+            android:theme="@style/Theme.MaterialComponents"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            app:cornerRadius="0dp"
+            android:layout_height="match_parent"
+            app:backgroundTint="@color/tasksBorderColor"
+            app:rippleColor="@color/keyboardButtonRippleColor"
+            android:insetBottom="0dp"
+            android:insetTop="0dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp" />
+
+
+
+
+    </LinearLayout>
 
 
 </RelativeLayout>
