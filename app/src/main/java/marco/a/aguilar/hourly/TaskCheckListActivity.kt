@@ -14,17 +14,25 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_task_check_list.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import marco.a.aguilar.hourly.adapter.TaskCheckListAdapter
 import marco.a.aguilar.hourly.enums.TaskType
 import marco.a.aguilar.hourly.models.Task
 import marco.a.aguilar.hourly.models.TaskCheckItem
 import marco.a.aguilar.hourly.models.TasksCompletedInfo
 import marco.a.aguilar.hourly.repository.HourBlockRepository
+import kotlin.math.log
 
+/**
+ * Next bug to fix.... losing focus from creating a new task..
+ */
 
 class TaskCheckListActivity : AppCompatActivity(),
     TaskCheckListAdapter.OnTaskCheckItemInteractionListener {
@@ -37,6 +45,7 @@ class TaskCheckListActivity : AppCompatActivity(),
 
     private lateinit var mTasksCompletedInfo: TasksCompletedInfo
     private var mTaskCheckItemList = mutableListOf<TaskCheckItem>()
+    private var mMostRecentFocusedTaskCheckItem : TaskCheckItem? = null
 
     private lateinit var mRepository: HourBlockRepository
 
@@ -73,6 +82,41 @@ class TaskCheckListActivity : AppCompatActivity(),
                 mTaskCheckItemList.add(TaskCheckItem(newTask, true))
 
                 viewAdapter.notifyItemInserted(mTaskCheckItemList.size - 1)
+            }
+        }
+
+        /**
+         * Now my only issue is fixing this crap. Hiding the keyboard also triggers
+         * the onTaskCheckItemFocusChanged event for both new and old items.
+         *
+         * If we delete an item, then we need to figure out a way so that we don't get
+         * an indexOutOfBounds exception
+         *
+         * Okay so one solution that worked (Kinda) was having a variable that
+         * onTaskCheckItemFocusChanged checks, something like hasBeenHardDeleted. If True,
+         * then you just skip whatever is in the !hasFocus.
+         *
+         * The only issue now is. That if users try to add a task, then hit the delete button after
+         * focus has been lost, then the item won't be deleted because it's still trying to save
+         * onto the database. So we need to have some kind of mechanism that waits for our our task
+         * to be saved before we can leave the activity or press the delete button..
+         *
+         * Kind how like Notion does.
+         * We can start looking for answers here:
+         *      https://stackoverflow.com/questions/58248191/how-to-get-a-callback-when-room-completed-deleting-or-adding-of-item
+         */
+        Log.d(TAG, "onCreate: Checking Value for mCurrentlyFocusedTask: $mMostRecentFocusedTaskCheckItem")
+        button_shortcut_delete.setOnClickListener {
+            mMostRecentFocusedTaskCheckItem?.let {
+                Log.d(TAG, "DeleteButtonShortcut: TaskCheckListItem: $it")
+
+                if(!it.isNewItem) {
+                    removeSavedTaskCheckItem(it)
+                } else {
+                    // New TaskCheckItem
+                    removeUnsavedTaskCheckItem(it)
+                }
+
             }
         }
 
@@ -143,20 +187,37 @@ class TaskCheckListActivity : AppCompatActivity(),
      */
     override fun onTaskCheckItemFocusChanged(position: Int, editText: EditText, textView: TextView, hasFocus: Boolean) {
 
+
         if(!hasFocus) {
+            enableFAB()
+            disableShortcutButtons()
+
             var editTextContent = editText.text.toString().trim()
             val textViewContent = textView.text.toString()
-            val taskCheckItem = mTaskCheckItemList[position]
 
-            enableFAB()
+            // This should go at the top
+            editText.visibility = View.GONE
+            textView.visibility = View.VISIBLE
+
+            // Clear text once we are done using it.
+            editText.text.clear()
+
+            /**
+             * Make sure to return if the item has already been deleted by shortcut button
+             */
+            if(!mTaskCheckItemList.contains(mMostRecentFocusedTaskCheckItem))
+                return
+
+            val taskCheckItem = mTaskCheckItemList[position]
 
             if(!recyclerView.isComputingLayout) {
                 when {
                     taskCheckItem.isNewItem -> {
                         if(editTextContent.isEmpty()) {
+
                             // Do nothing in DB, just delete it from list and notify RV
                             mTaskCheckItemList.remove(taskCheckItem)
-                            viewAdapter.notifyItemRemoved(mTaskCheckItemList.lastIndex)
+                            viewAdapter.notifyDataSetChanged()
                         } else {
                             // Put new item's content into textView
                             textView.text = editTextContent
@@ -167,7 +228,7 @@ class TaskCheckListActivity : AppCompatActivity(),
                             // block_id is assigned when we create the task so we can just insert
                             insertTask(taskCheckItem.task)
 
-                            viewAdapter.notifyItemChanged(mTaskCheckItemList.lastIndex)
+                            viewAdapter.notifyDataSetChanged()
                         }
                     }
                     // Old item
@@ -183,23 +244,23 @@ class TaskCheckListActivity : AppCompatActivity(),
                 }
             }
 
-            // This should go at the top
-            editText.visibility = View.GONE
-            textView.visibility = View.VISIBLE
-
-            // Clear text once we are done using it.
-            editText.text.clear()
         } else {
             disableFAB()
+            enableShortcutButtons()
+
+            Log.d(TAG, "onTaskCheckItemFocusChanged: Focused...")
+            // Replace currently focused task
+            mMostRecentFocusedTaskCheckItem = mTaskCheckItemList[position]
+            Log.d(TAG, "onTaskCheckItemFocusChanged: $mMostRecentFocusedTaskCheckItem")
         }
 
     }
 
 
     override fun onBackPressed() {
-        super.onBackPressed()
-
         hideKeyboard(this)
+
+        super.onBackPressed()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -215,9 +276,24 @@ class TaskCheckListActivity : AppCompatActivity(),
 
     override fun onStop() {
         super.onStop()
-        Log.d(TAG, "onStop: Calling onStop")
 
         hideKeyboard(this)
+    }
+
+    fun removeUnsavedTaskCheckItem(newTaskCheckItem: TaskCheckItem) {
+        mTaskCheckItemList.remove(newTaskCheckItem)
+        viewAdapter.notifyDataSetChanged()
+        hideKeyboard(this)
+    }
+
+    // Removes saved Task from database
+    fun removeSavedTaskCheckItem(oldTaskCheckItem: TaskCheckItem) {
+        hideKeyboard(this)
+
+        deleteTask(oldTaskCheckItem.task)
+
+        mTaskCheckItemList.remove(oldTaskCheckItem)
+        viewAdapter.notifyDataSetChanged()
     }
 
     fun hideKeyboard(activity: Activity) {
@@ -241,12 +317,24 @@ class TaskCheckListActivity : AppCompatActivity(),
         fab_task_checklist.visibility = View.VISIBLE
     }
 
+    fun enableShortcutButtons() {
+        shortcut_buttons_container.visibility = View.VISIBLE
+    }
+
+    fun disableShortcutButtons() {
+        shortcut_buttons_container.visibility = View.GONE
+    }
+
     fun updateTask(updatedTask: Task) {
         mRepository.updateTask(updatedTask)
     }
 
     fun insertTask(newTask: Task) {
         mRepository.insertTask(newTask)
+    }
+
+    fun deleteTask(deletedTask: Task) {
+        mRepository.deleteTask(deletedTask)
     }
 
     /**
@@ -257,6 +345,11 @@ class TaskCheckListActivity : AppCompatActivity(),
      *  outside of the EditText.
      *
      *  Note: We can also use this code for our Temi application!
+     *
+     *  Update(2/17/21)
+     *      Added another condition to the if statement so that it the keyboard won't close if
+     *      the buttons inside the shortcuts container are clicked. This also help fix the bug
+     *      where the buttons weren't triggering the click event.
      */
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
         if(event?.action == MotionEvent.ACTION_DOWN) {
@@ -267,7 +360,11 @@ class TaskCheckListActivity : AppCompatActivity(),
                     val outRect: Rect = Rect()
                     v.getGlobalVisibleRect(outRect)
 
-                    if(!outRect.contains(event.getRawX().toInt(), event.getRawY().toInt())) {
+                    val shortCutContainerRect = Rect()
+                    shortcut_buttons_container.getGlobalVisibleRect(shortCutContainerRect)
+
+                    if(!outRect.contains(event.getRawX().toInt(), event.getRawY().toInt())
+                        && !shortCutContainerRect.contains(event.getRawX().toInt(), event.getRawY().toInt())) {
                         v.clearFocus()
                         val imm: InputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                         imm.hideSoftInputFromWindow(v.windowToken, 0)
@@ -292,17 +389,18 @@ class TaskCheckListActivity : AppCompatActivity(),
                     return false
                 }
 
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            /**
+             * Not Using removeSavedTask() here because we're using viewHolder.adapterPosition
+             * to specify which item was removed.
+             */
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                     val deletedTask = mTaskCheckItemList[viewHolder.adapterPosition].task
-                    mRepository.deleteTask(deletedTask)
+                    deleteTask(deletedTask)
 
                     mTaskCheckItemList.removeAt(viewHolder.adapterPosition)
                     viewAdapter.notifyItemRemoved(viewHolder.adapterPosition)
-
-                    Toast.makeText(context, "Task removed", Toast.LENGTH_SHORT).show()
                 }
             }
     }
-
 
 }

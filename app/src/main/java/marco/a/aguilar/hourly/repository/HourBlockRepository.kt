@@ -2,10 +2,7 @@ package marco.a.aguilar.hourly.repository
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import marco.a.aguilar.hourly.models.HourBlock
 import marco.a.aguilar.hourly.models.Task
 import marco.a.aguilar.hourly.models.TasksCompletedInfo
@@ -52,7 +49,7 @@ class HourBlockRepository private constructor(context: Context) {
     fun deleteTask(task: Task) {
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
-                database.taskDao().deleteTask(task)
+                 database.taskDao().deleteTask(task)
             }
         }
     }
