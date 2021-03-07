@@ -26,8 +26,6 @@ import marco.a.aguilar.hourly.repository.HourBlockRepository
 
 /**
  * todo: Add a listener for each item's checkbox so we can mark it as complete
- *
- * todo: fix bug that puts shortcut buttons on top of a TaskCheckItem if the list is long
  */
 
 class TaskCheckListActivity : AppCompatActivity(),
