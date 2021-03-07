@@ -2,7 +2,6 @@ package marco.a.aguilar.hourly
 
 import android.app.Activity
 import android.content.Context
-import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
@@ -14,24 +13,21 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_task_check_list.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import marco.a.aguilar.hourly.adapter.TaskCheckListAdapter
 import marco.a.aguilar.hourly.enums.TaskType
 import marco.a.aguilar.hourly.models.Task
 import marco.a.aguilar.hourly.models.TaskCheckItem
 import marco.a.aguilar.hourly.models.TasksCompletedInfo
 import marco.a.aguilar.hourly.repository.HourBlockRepository
-import kotlin.math.log
 
 /**
- * Next bug to fix.... losing focus from creating a new task..
+ * todo: Add a listener for each item's checkbox so we can mark it as complete
+ *
+ * todo: fix bug that puts shortcut buttons on top of a TaskCheckItem if the list is long
  */
 
 class TaskCheckListActivity : AppCompatActivity(),
@@ -85,50 +81,13 @@ class TaskCheckListActivity : AppCompatActivity(),
             }
         }
 
-        /**
-         * Now my only issue is fixing this crap. Hiding the keyboard also triggers
-         * the onTaskCheckItemFocusChanged event for both new and old items.
-         *
-         * If we delete an item, then we need to figure out a way so that we don't get
-         * an indexOutOfBounds exception
-         *
-         * Okay so one solution that worked (Kinda) was having a variable that
-         * onTaskCheckItemFocusChanged checks, something like hasBeenHardDeleted. If True,
-         * then you just skip whatever is in the !hasFocus.
-         *
-         * The only issue now is. That if users try to add a task, then hit the delete button after
-         * focus has been lost, then the item won't be deleted because it's still trying to save
-         * onto the database. So we need to have some kind of mechanism that waits for our our task
-         * to be saved before we can leave the activity or press the delete button..
-         *
-         * Kind how like Notion does.
-         * We can start looking for answers here:
-         *      https://stackoverflow.com/questions/58248191/how-to-get-a-callback-when-room-completed-deleting-or-adding-of-item
-         */
-        Log.d(TAG, "onCreate: Checking Value for mCurrentlyFocusedTask: $mMostRecentFocusedTaskCheckItem")
-        button_shortcut_delete.setOnClickListener {
-            mMostRecentFocusedTaskCheckItem?.let {
-                Log.d(TAG, "DeleteButtonShortcut: TaskCheckListItem: $it")
-
-                if(!it.isNewItem) {
-                    removeSavedTaskCheckItem(it)
-                } else {
-                    // New TaskCheckItem
-                    removeUnsavedTaskCheckItem(it)
-                }
-
-            }
-        }
-
-        /**
-         * todo: Add a listener for each item's checkbox so we can mark it as complete
-         */
+        initShortcutButtons()
 
         initRecyclerView()
     }
 
 
-    fun initRecyclerView() {
+    private fun initRecyclerView() {
         viewManager = LinearLayoutManager(this)
         viewAdapter = TaskCheckListAdapter(mTaskCheckItemList, this)
 
@@ -157,6 +116,35 @@ class TaskCheckListActivity : AppCompatActivity(),
         // Used for swiping left to delete
         val simpleCallback = getItemTouchHelperSimpleCallback(this)
         ItemTouchHelper(simpleCallback).attachToRecyclerView(recyclerView)
+    }
+
+    private fun initShortcutButtons() {
+        /**
+         * The only issue now is. That if users try to add a task, then hit the delete button after
+         * focus has been lost, then the item won't be deleted because it's still trying to save
+         * onto the database. So we need to have some kind of mechanism that waits for our our task
+         * to be saved before we can leave the activity or press the delete button..
+         *
+         * Kind how like Notion does.
+         * We can start looking for answers here:
+         *      https://stackoverflow.com/questions/58248191/how-to-get-a-callback-when-room-completed-deleting-or-adding-of-item
+         */
+        button_shortcut_delete.setOnClickListener {
+            mMostRecentFocusedTaskCheckItem?.let {
+                if(!it.isNewItem) {
+                    removeSavedTaskCheckItem(it)
+                } else {
+                    // New TaskCheckItem
+                    removeUnsavedTaskCheckItem(it)
+                }
+            }
+        }
+
+        button_shortcut_accept.setOnClickListener {
+            // Must place hideKeyboard() before clearing focus
+            hideKeyboard(this)
+            currentFocus?.clearFocus()
+        }
     }
 
 
@@ -298,9 +286,9 @@ class TaskCheckListActivity : AppCompatActivity(),
 
     fun hideKeyboard(activity: Activity) {
         val imm = activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        //Find the currently focused view, so we can grab the correct window token from it.
+        // Find the currently focused view, so we can grab the correct window token from it.
         var view = activity.currentFocus
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        // If no view currently has focus, create a new one, just so we can grab a window token from it
         if (view == null) {
             view = View(activity)
         }
