@@ -31,6 +31,9 @@ interface TaskDao {
     @Insert
     suspend fun insertTask(task: Task)
 
+    @Insert
+    suspend fun insertTasks(tasks: List<Task>)
+
     @Delete
     suspend fun deleteTask(task: Task)
 

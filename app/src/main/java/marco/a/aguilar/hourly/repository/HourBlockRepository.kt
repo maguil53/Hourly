@@ -46,6 +46,14 @@ class HourBlockRepository private constructor(context: Context) {
         }
     }
 
+    fun insertTasks(tasks: List<Task>) {
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                database.taskDao().insertTasks(tasks)
+            }
+        }
+    }
+
     fun deleteTask(task: Task) {
         GlobalScope.launch {
             withContext(Dispatchers.IO) {

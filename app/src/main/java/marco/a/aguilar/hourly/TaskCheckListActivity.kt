@@ -24,11 +24,6 @@ import marco.a.aguilar.hourly.models.TaskCheckItem
 import marco.a.aguilar.hourly.models.TasksCompletedInfo
 import marco.a.aguilar.hourly.repository.HourBlockRepository
 
-/**
- * todo: Fix bug: If you create a new task and then mark it as complete,
- *  then the changes won't be saved. It works after you come back to the
- *  HourBlock but if you check the task right after creating it, it won't be saved.
- */
 
 class TaskCheckListActivity : AppCompatActivity(),
     TaskCheckListAdapter.OnTaskCheckItemInteractionListener {
@@ -42,6 +37,8 @@ class TaskCheckListActivity : AppCompatActivity(),
     private lateinit var mTasksCompletedInfo: TasksCompletedInfo
     private var mTaskCheckItemList = mutableListOf<TaskCheckItem>()
     private var mMostRecentFocusedTaskCheckItem : TaskCheckItem? = null
+
+    private var mTasksToBeInserted = mutableListOf<Task>()
 
     private lateinit var mRepository: HourBlockRepository
 
@@ -86,6 +83,24 @@ class TaskCheckListActivity : AppCompatActivity(),
         initRecyclerView()
     }
 
+    override fun onStop() {
+        super.onStop()
+
+        hideKeyboard(this)
+
+        insertTasks()
+    }
+
+    /**
+     * Inserting Tasks once the User leaves the activity now. This helps us access the database
+     * once, just incase the user decides to add more than one task. It also fixes our previous
+     * bug where the Task when remain unchecked if the user checked it right after creating it.
+     */
+    private fun insertTasks() {
+        if(mTasksToBeInserted.size > 0) {
+            mRepository.insertTasks(mTasksToBeInserted)
+        }
+    }
 
     private fun initRecyclerView() {
         viewManager = LinearLayoutManager(this)
@@ -213,8 +228,7 @@ class TaskCheckListActivity : AppCompatActivity(),
                             taskCheckItem.isNewItem = false
                             taskCheckItem.task.description = editTextContent
 
-                            // block_id is assigned when we create the task so we can just insert
-                            insertTask(taskCheckItem.task)
+                            mTasksToBeInserted.add(taskCheckItem.task)
 
                             viewAdapter.notifyDataSetChanged()
                         }
@@ -270,12 +284,6 @@ class TaskCheckListActivity : AppCompatActivity(),
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onStop() {
-        super.onStop()
-
-        hideKeyboard(this)
-    }
-
     fun removeUnsavedTaskCheckItem(newTaskCheckItem: TaskCheckItem) {
         mTaskCheckItemList.remove(newTaskCheckItem)
         viewAdapter.notifyDataSetChanged()
@@ -323,10 +331,6 @@ class TaskCheckListActivity : AppCompatActivity(),
 
     fun updateTask(updatedTask: Task) {
         mRepository.updateTask(updatedTask)
-    }
-
-    fun insertTask(newTask: Task) {
-        mRepository.insertTask(newTask)
     }
 
     fun deleteTask(deletedTask: Task) {
@@ -394,7 +398,7 @@ class TaskCheckListActivity : AppCompatActivity(),
                     deleteTask(deletedTask)
 
                     mTaskCheckItemList.removeAt(viewHolder.adapterPosition)
-                    viewAdapter.notifyItemRemoved(viewHolder.adapterPosition)
+                    viewAdapter.notifyDataSetChanged()
                 }
             }
     }
