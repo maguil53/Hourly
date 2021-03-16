@@ -1,20 +1,12 @@
 package marco.a.aguilar.hourly.adapter
 
-import android.content.ContentValues.TAG
-import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.TextView
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.view.isVisible
+import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.checklist_item.view.*
 import marco.a.aguilar.hourly.R
-import marco.a.aguilar.hourly.models.Task
 import marco.a.aguilar.hourly.models.TaskCheckItem
 
 class TaskCheckListAdapter(private var mTaskCheckItemList: List<TaskCheckItem>,
@@ -44,8 +36,9 @@ class TaskCheckListAdapter(private var mTaskCheckItemList: List<TaskCheckItem>,
 
         val taskDescriptionTextView: TextView = holder.itemView.textview_checklist_task_description
         val taskDescriptionEditText: EditText = holder.itemView.edittext_checklist_task_description
+        val taskCheckBox: CheckBox = holder.itemView.checkbox_checklist_task_iscomplete
 
-        holder.itemView.checkbox_checklist_task_iscomplete.isChecked = isComplete
+        taskCheckBox.isChecked = isComplete
         taskDescriptionTextView.text = taskDescription
 
         taskDescriptionTextView.setOnClickListener {
@@ -56,6 +49,10 @@ class TaskCheckListAdapter(private var mTaskCheckItemList: List<TaskCheckItem>,
         taskDescriptionEditText.setOnFocusChangeListener { view, hasFocus ->
             mOnTaskCheckItemInteractionListener.onTaskCheckItemFocusChanged(position, view as EditText,
                 taskDescriptionTextView, hasFocus)
+        }
+
+        taskCheckBox.setOnClickListener {
+            mOnTaskCheckItemInteractionListener.onTaskChecked(position, taskCheckBox.isChecked)
         }
 
         if(!isNewTaskCheckItem) {
@@ -83,6 +80,8 @@ class TaskCheckListAdapter(private var mTaskCheckItemList: List<TaskCheckItem>,
          * call notifyItemChanged(position)
          */
         fun onTaskCheckItemFocusChanged(position: Int, editText: EditText, textView: TextView, hasFocus: Boolean)
+
+        fun onTaskChecked(position: Int, isComplete: Boolean)
 
     }
 }

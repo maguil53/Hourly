@@ -25,7 +25,9 @@ import marco.a.aguilar.hourly.models.TasksCompletedInfo
 import marco.a.aguilar.hourly.repository.HourBlockRepository
 
 /**
- * todo: Add a listener for each item's checkbox so we can mark it as complete
+ * todo: Fix bug: If you create a new task and then mark it as complete,
+ *  then the changes won't be saved. It works after you come back to the
+ *  HourBlock but if you check the task right after creating it, it won't be saved.
  */
 
 class TaskCheckListActivity : AppCompatActivity(),
@@ -242,6 +244,14 @@ class TaskCheckListActivity : AppCompatActivity(),
 
     }
 
+    override fun onTaskChecked(position: Int, isComplete: Boolean) {
+        Log.d(TAG, "onTaskChecked: Updating task at position: $position")
+        
+        val updatedTask = mTaskCheckItemList[position].task
+        updatedTask.isComplete = isComplete
+
+        mRepository.updateTask(updatedTask)
+    }
 
     override fun onBackPressed() {
         hideKeyboard(this)
