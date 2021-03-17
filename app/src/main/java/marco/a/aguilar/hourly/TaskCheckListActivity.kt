@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
@@ -13,6 +14,8 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +27,14 @@ import marco.a.aguilar.hourly.models.TaskCheckItem
 import marco.a.aguilar.hourly.models.TasksCompletedInfo
 import marco.a.aguilar.hourly.repository.HourBlockRepository
 
+
+/**
+ * Todo: Add a Menu button for this activity that lets users Clear the list of tasks
+ *  in case they don't want to delete them one by one
+ *
+ * Todo: Wipe the Tasks Table from the Database after the 24th hour, users shouldn't
+ *  see the tasks they wrote from the previous day.
+ */
 
 class TaskCheckListActivity : AppCompatActivity(),
     TaskCheckListAdapter.OnTaskCheckItemInteractionListener {
@@ -273,15 +284,33 @@ class TaskCheckListActivity : AppCompatActivity(),
         super.onBackPressed()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.tasks_check_list, menu)
+
+        menu?.findItem(R.id.clear_tasks)?.icon?.let {
+            DrawableCompat.setTint(
+                it,
+                ContextCompat.getColor(this, R.color.white)
+            )
+        }
+
+
+        return super.onCreateOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        return when (item.itemId) {
             android.R.id.home -> {
                 hideKeyboard(this)
                 onBackPressed()
-                return true
+                true
             }
+            R.id.clear_tasks -> {
+                Toast.makeText(this, "Clearing all tasks..", Toast.LENGTH_SHORT).show()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 
     fun removeUnsavedTaskCheckItem(newTaskCheckItem: TaskCheckItem) {
