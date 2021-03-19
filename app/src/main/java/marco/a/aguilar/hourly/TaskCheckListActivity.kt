@@ -29,9 +29,6 @@ import marco.a.aguilar.hourly.repository.HourBlockRepository
 
 
 /**
- * Todo: Add a Menu button for this activity that lets users Clear the list of tasks
- *  in case they don't want to delete them one by one
- *
  * Todo: Wipe the Tasks Table from the Database after the 24th hour, users shouldn't
  *  see the tasks they wrote from the previous day.
  */
@@ -306,10 +303,26 @@ class TaskCheckListActivity : AppCompatActivity(),
                 true
             }
             R.id.clear_tasks -> {
-                Toast.makeText(this, "Clearing all tasks..", Toast.LENGTH_SHORT).show()
+                clearTasks()
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    fun clearTasks() {
+        if(mTaskCheckItemList.isEmpty()) {
+            Toast.makeText(this, "There are no Tasks.", Toast.LENGTH_SHORT).show()
+        } else {
+            mRepository.clearTasks(mTaskCheckItemList[0].task.taskBlockId)
+            // Clear mTaskCheckItemList after database has been cleared.
+            mTaskCheckItemList.clear()
+            viewAdapter.notifyDataSetChanged()
+            /**
+             * Clear mTasksToBeInserted so they aren't entered into the database
+             * if the user presses the clear button before leaving the activity.
+             */
+            mTasksToBeInserted.clear()
         }
     }
 

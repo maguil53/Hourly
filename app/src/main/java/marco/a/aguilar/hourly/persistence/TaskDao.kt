@@ -37,6 +37,9 @@ interface TaskDao {
     @Delete
     suspend fun deleteTask(task: Task)
 
+    @Query("DELETE FROM tasks WHERE task_block_id = :task_block_id")
+    suspend fun clearTasks(task_block_id: Int)
+
     /**
      * This works.
      */

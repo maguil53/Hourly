@@ -61,4 +61,12 @@ class HourBlockRepository private constructor(context: Context) {
             }
         }
     }
+
+    fun clearTasks(task_block_id: Int) {
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                database.taskDao().clearTasks(task_block_id)
+            }
+        }
+    }
 }
