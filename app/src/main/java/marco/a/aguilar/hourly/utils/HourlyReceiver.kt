@@ -31,6 +31,22 @@ class HourlyReceiver : BroadcastReceiver() {
                 // hourBlockIsComplete will determine the color of the square
                 database.hourBlockDao().updateIsComplete(hourBlockIsComplete, evaluatedHourBlockId)
 
+                /**
+                 * This part of our code is going to have to wait. Since we want to save the
+                 * user's preference for their sleep schedule. Then we'll implement the logic
+                 * that will determine which blocks should be evaluated. Right now this is how I
+                 * see it. If evaulatedHourBlockId falls in the range of their sleeping schedule,
+                 * then we'll mark it as "Complete" (Also, I think this will allow us to get rid
+                 * of the TaskType attribute for our Task objects but I don't know yet). I think
+                 * we'll end up just leaving it alone and since when the user saves their sleeping
+                 * schedule in the preferences we should mark those blocks as "COMPLETE" so they
+                 * always show up green. Then if the user ever changes their sleep preference we
+                 * should update the database accordingly (mark those HourBlocks as incomplete again
+                 * etc). Finally, we'll only clear the Tasks table for every HourBlock except for the
+                 * last hour before the user goes to sleep because we still want them to see whether
+                 * they got a green/red square. And once the first hour of them waking up is finished
+                 * we'll clear that last block.
+                 */
 
             }
         }
