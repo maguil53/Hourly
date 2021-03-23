@@ -9,12 +9,5 @@
         android:title="@string/menu_item_recovery"
         app:showAsAction="ifRoom"/>
 
-    <item
-        android:id="@+id/action_theme_toggle"
-        android:icon="@drawable/ic_theme_toggle"
-        android:title="@string/menu_item_theme_toggle"
-        app:showAsAction="ifRoom"/>
-    
-
 
 </menu>

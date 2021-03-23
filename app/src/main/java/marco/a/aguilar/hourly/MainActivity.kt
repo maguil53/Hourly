@@ -95,12 +95,6 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        menu?.findItem(R.id.action_theme_toggle)?.icon?.let {
-            DrawableCompat.setTint(
-                it,
-                ContextCompat.getColor(this, R.color.white)
-            )
-        }
 
         return super.onCreateOptionsMenu(menu)
     }
