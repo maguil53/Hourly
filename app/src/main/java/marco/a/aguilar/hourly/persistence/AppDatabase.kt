@@ -29,28 +29,15 @@ abstract class AppDatabase : RoomDatabase() {
 
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
-                        /**
-                         * Todo:
-                         *  1) Check if onCreate callback is called more than once if we close the app
-                         *  and open it again. I'm worried that once we start saving information our
-                         *  database will get wiped.
-                         */
-                        Log.d(TAG, "onCreate: Database created...calling callback")
 
                         /**
-                         * Yaaaay, we did this using Coroutines instead! Used suspend keyword in HourBlockDao.
+                         * Did this using Coroutines instead. Used suspend keyword in HourBlockDao.
                          * Thanks to this article, I understood Coroutines better:
                          *      https://medium.com/androiddevelopers/coroutines-on-android-part-i-getting-the-background-3e0e54d20bb
                          */
                         GlobalScope.launch {
                             withContext(Dispatchers.IO) {
                                 AppDatabase.getInstance(it.applicationContext).hourBlockDao().insertAllEmptyBlocks(HourBlock.prepopulateHourBlocks())
-
-                                /**
-                                 * Todo(): Delete Later. For now we're just using this
-                                 * until we implement a way to generate tasks for an HourBlock
-                                 */
-                                 AppDatabase.getInstance(it.applicationContext).taskDao().insertDummyTasks(Task.generateDummyTasks())
                             }
                         }
                     }

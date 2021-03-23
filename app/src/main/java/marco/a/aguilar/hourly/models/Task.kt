@@ -54,15 +54,6 @@ data class Task(
             return false
         }
 
-        fun generateDummyTasks(): List<Task> {
-            return listOf(
-                Task(TaskType.WORK, "Do the dishes",1, true),
-                Task(TaskType.WORK, "Work on Hourly",1, true),
-                Task(TaskType.WORK, "Watch Anime with the queen",1, false)
-            )
-        }
-
-
     }
 
 
