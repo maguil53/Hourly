@@ -46,6 +46,9 @@ class HourlyReceiver : BroadcastReceiver() {
                  * last hour before the user goes to sleep because we still want them to see whether
                  * they got a green/red square. And once the first hour of them waking up is finished
                  * we'll clear that last block.
+                 *
+                 * Or in Task.checkIfAllTasksAreComplete, return true if the TaskType is RECOVER.
+                 * Which of course will require us to save a "task" in each HourBlock meant for "sleep"
                  */
 
             }

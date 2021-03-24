@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SleepScheduleActivity">
+
+    <include
+        layout="@layout/toolbar_main"
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/textview_sleep_schedule"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:text="@string/sleep_schedule"
+        android:layout_marginTop="80dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/my_toolbar"/>
+
+    <!-- Container for Bedtime row -->
+    <LinearLayout
+        android:id="@+id/bedtime_container"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/textview_sleep_schedule"
+        android:layout_marginTop="80dp"
+        android:weightSum="2"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/textview_bedtime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:layout_marginEnd="20dp"
+            android:text="@string/bedtime"/>
+
+        <!-- Needed to put my Button in a ViewGroup so that I could-->
+        <!-- split the space shared by my TextView and Button down the middle-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_bedtime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:layout_marginStart="10dp"
+                android:theme="@style/Theme.MaterialComponents"
+                app:backgroundTint="@color/colorAccent"
+                android:text="@string/select"/>
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <!-- Container for Hours of Sleep row -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/bedtime_container"
+        android:layout_marginTop="40dp"
+        android:weightSum="2"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/textview_hours_of_sleep"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:layout_marginEnd="20dp"
+            android:text="@string/hours_of_sleep"/>
+
+<!--        Needed to put my Button in a ViewGroup so that I could-->
+<!--        split the space shared by my TextView and Button down the middle-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_hours_of_sleep"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:layout_marginStart="10dp"
+                android:theme="@style/Theme.MaterialComponents"
+                app:backgroundTint="@color/colorAccent"
+                android:text="@string/select"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>
