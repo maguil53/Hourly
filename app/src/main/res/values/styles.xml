@@ -11,11 +11,19 @@
         <item name="android:textColor">@color/colorLightGrey</item>
 <!--        Changes color for the 3 dots in the menu-->
         <item name="android:textColorSecondary">@color/white</item>
+
+        <item name="android:textColorPrimary">#FFFFFF</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+    </style>
+
+
+    <style name="MyAppTheme.NumberPicker" parent="AppTheme">
+        <item name="android:colorControlNormal"> ?colorAccent </item>
+        <item name="android:textSize">18sp</item>
     </style>
 
     <!-- ToolBar -->

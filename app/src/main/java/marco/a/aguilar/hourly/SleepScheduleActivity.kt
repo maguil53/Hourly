@@ -30,10 +30,12 @@ class SleepScheduleActivity : AppCompatActivity(), TimePickerDialog.OnTimeSetLis
             mTimePickerDialog.show(supportFragmentManager, "TimePickerDialog")
         }
 
+        number_picker_hours_of_sleep.maxValue = 8
+        number_picker_hours_of_sleep.minValue = 1
 
     }
 
-    fun initTimePicker() {
+    private fun initTimePicker() {
         // Will help us get Hour based on user's TimeZone
         val calendar = GregorianCalendar(TimeZone.getDefault())
 
@@ -59,8 +61,11 @@ class SleepScheduleActivity : AppCompatActivity(), TimePickerDialog.OnTimeSetLis
      *
      * ToDo: Create a member variable that checks if both "bedtime" and "hours of sleep"
      *  have been set. We should only write to our SharedPreferences once they are both set.
-     *  Not sure if we need to create an observer for both variables or how we're going
-     *  to implement it yet.
+     *  Just use onTimeSet and whatever function our Number picker will use to call a function
+     *  that will check if both items are set, then we'll save.
+     *  For onTimeSet, I think we'll just save hourOfDay as-is since our TimeBlocks are from
+     *  1-24 (I think). We might have to adjust hourOfDay to match the way we define our HourBlock
+     *  Hours.
      */
     override fun onTimeSet(view: TimePickerDialog?, hourOfDay: Int, minute: Int, second: Int) {
         var timePeriod = ""

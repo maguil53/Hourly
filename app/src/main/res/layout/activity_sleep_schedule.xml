@@ -68,7 +68,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="100dp"
         android:layout_below="@id/bedtime_container"
         android:layout_marginTop="40dp"
         android:weightSum="2"
@@ -84,22 +84,22 @@
             android:layout_marginEnd="20dp"
             android:text="@string/hours_of_sleep"/>
 
-<!--        Needed to put my Button in a ViewGroup so that I could-->
-<!--        split the space shared by my TextView and Button down the middle-->
+        <!-- Needed to put my NumberPicker in a ViewGroup so that I could -->
+        <!-- split the space shared by my TextView and Button down the middle -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_hours_of_sleep"
+            <NumberPicker
+                android:id="@+id/number_picker_hours_of_sleep"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
+                android:scrollbarSize="30dp"
                 android:layout_marginStart="10dp"
-                android:theme="@style/Theme.MaterialComponents"
-                app:backgroundTint="@color/colorAccent"
-                android:text="@string/select"/>
+                android:theme="@style/MyAppTheme.NumberPicker"
+                />
+
         </LinearLayout>
     </LinearLayout>
 
