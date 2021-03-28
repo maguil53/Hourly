@@ -20,4 +20,10 @@
     <string name="hours_of_sleep">Hours of Sleep:</string>
     <string name="select">Select</string>
 
+
+    <!-- Shared Preference Keys -->
+    <string name="bedtime_start_hour_key">Bedtime Start Hour Key</string>
+    <string name="bedtime_end_hour">Bedtime End Hour</string>
+    <string name="hours_of_sleep_key">Hours of Sleep Key</string>
+
 </resources>

@@ -1,13 +1,14 @@
 package marco.a.aguilar.hourly
 
 import android.content.ContentValues.TAG
+import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -15,7 +16,6 @@ import androidx.lifecycle.observe
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import marco.a.aguilar.hourly.adapter.ProgressAdapter
-import marco.a.aguilar.hourly.adapter.TasksAdapter
 import marco.a.aguilar.hourly.models.HourBlock
 import marco.a.aguilar.hourly.viewmodel.ProgressViewModel
 
@@ -25,6 +25,8 @@ class ProgressFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewAdapter: ProgressAdapter
     private lateinit var viewManager: RecyclerView.LayoutManager
+
+    private val sharedPrefFile = "marco.a.aguilar.hourly.shared_preference"
 
     private val viewModel: ProgressViewModel by lazy {
         val activity = requireNotNull(this.activity) {
@@ -63,6 +65,28 @@ class ProgressFragment : Fragment() {
             viewAdapter.setHourBlocks(it)
         }
     }
+
+
+    /**
+     * This works
+     */
+//    override fun onResume() {
+//        super.onResume()
+//
+//        /**
+//         * Testing SharedPreferences
+//         */
+//        val sharedPref = activity?.getSharedPreferences(
+//            sharedPrefFile, MODE_PRIVATE);
+//
+//        val bedtimeStart = sharedPref?.getInt(getString(R.string.bedtime_start_hour), -1)
+//        val bedtimeEnd = sharedPref?.getInt(getString(R.string.bedtime_end_hour), -1)
+//
+//        if(bedtimeStart != -1) {
+//            Log.d(TAG, "onCreateView: bedTimeStart: $bedtimeStart")
+//            Log.d(TAG, "onCreateView: bedTimeStart: $bedtimeEnd")
+//        }
+//    }
 
 
     fun initRecyclerView(view: View) {

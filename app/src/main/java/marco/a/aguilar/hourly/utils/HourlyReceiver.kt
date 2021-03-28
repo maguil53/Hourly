@@ -2,18 +2,22 @@ package marco.a.aguilar.hourly.utils
 
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import marco.a.aguilar.hourly.R
 import marco.a.aguilar.hourly.models.Task
 import marco.a.aguilar.hourly.persistence.AppDatabase
 
 private const val TAG = "HourlyReceiver"
 
 class HourlyReceiver : BroadcastReceiver() {
+
+    private val sharedPrefFile = "marco.a.aguilar.hourly.shared_preference"
 
     override fun onReceive(context: Context, intent: Intent) {
         val nextHour: Int = intent.getIntExtra("nextHour", -1)
@@ -26,7 +30,30 @@ class HourlyReceiver : BroadcastReceiver() {
                 val evaluatedHourBlockId = nextHour - 1
 
                 val tasks: List<Task> = database.taskDao().getTasksForHourBlock(evaluatedHourBlockId)
-                val hourBlockIsComplete = Task.checkIfAllTasksAreComplete(tasks)
+                var hourBlockIsComplete = Task.checkIfAllTasksAreComplete(tasks)
+
+                /**
+                 * Not sure if this will work, if evaluated hour is in one of the sleeping hours,
+                 * make hourBlockIsComplete as true
+                 */
+                val sharedPref = context.getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
+
+                val bedtimeStart = sharedPref.getInt(context.getString(R.string.bedtime_start_hour_key), -1)
+                val hoursOfSleep = sharedPref.getInt(context.getString(R.string.hours_of_sleep_key), -1)
+
+//                val bedtimeEnd = sharedPref.getInt(context.getString(R.string.bedtime_end_hour), -1)
+
+                if(bedtimeStart != -1) {
+                    Log.d(TAG, "onCreateView: bedTimeStart: $bedtimeStart")
+                    Log.d(TAG, "onCreateView: hoursOfSleep: $hoursOfSleep")
+
+                    val listOfSleepHours = getRangeOfSleepHours(bedtimeStart, hoursOfSleep)
+
+                    if(listOfSleepHours.contains(evaluatedHourBlockId))
+                        hourBlockIsComplete = true
+                }
+
+
 
                 // hourBlockIsComplete will determine the color of the square
                 database.hourBlockDao().updateIsComplete(hourBlockIsComplete, evaluatedHourBlockId)
@@ -54,5 +81,49 @@ class HourlyReceiver : BroadcastReceiver() {
             }
         }
 
+    }
+
+    private fun getRangeOfSleepHours(bedtimeStart: Int, hoursOfSleep: Int): MutableList<Int> {
+        val sleepHours = mutableListOf(bedtimeStart)
+
+        var hourToBeAdded = bedtimeStart
+        // Subtracting 1 because we added bedtimeStart already
+        var remainingHoursOfSleep = hoursOfSleep - 1
+
+        do {
+            hourToBeAdded += 1
+
+            if(hourToBeAdded > 24)
+                hourToBeAdded = 1
+
+            sleepHours.add(hourToBeAdded)
+            remainingHoursOfSleep -= 1
+        } while (remainingHoursOfSleep != 0)
+
+
+        return sleepHours
+
+        /**
+         * Say hoursOfSleep is 5
+         *     bedTimeStart is 24
+         *
+         *     hours to sleep (12am, 1am, 2am, 3am, 4am)
+         *
+         *
+         *     do {
+         *          hourToBeAdded += 1
+         *          if(hourToBeAdded > 24)
+         *              hourToBeAdded = 1
+         *
+         *          sleepHours.add(hourToBeAdded)
+         *          remainingHoursOfSleep -= 1
+         *     } while(remainingHoursOfSleep != 0)
+         *
+         *
+         *     sleepHours after loop:
+         *          (24, 1, 2, 3, 4)
+         *               3  2  1  0
+         *
+         */
     }
 }
