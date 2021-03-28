@@ -9,6 +9,8 @@ import android.view.MenuItem
 import android.widget.Toast
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog
 import kotlinx.android.synthetic.main.activity_sleep_schedule.*
+import marco.a.aguilar.hourly.models.HourBlock
+import marco.a.aguilar.hourly.repository.HourBlockRepository
 import java.util.*
 
 class SleepScheduleActivity : AppCompatActivity(), TimePickerDialog.OnTimeSetListener {
@@ -20,22 +22,17 @@ class SleepScheduleActivity : AppCompatActivity(), TimePickerDialog.OnTimeSetLis
     private var mBedTime: Int = -1
     private var mHoursOfSleep: Int = 1
 
-    lateinit var mSharedPreferences: SharedPreferences
-    private val sharedPrefFile = "marco.a.aguilar.hourly.shared_preference"
+    private lateinit var mRepository: HourBlockRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sleep_schedule)
 
+        mRepository = HourBlockRepository.getInstance(this)
+
         setSupportActionBar(findViewById(R.id.my_toolbar))
         // Get a support ActionBar corresponding to this toolbar and enable the Up button
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        /**
-         * For some reason, getSharedPreferences() with the specific filename worked,
-         * but using getPreferences() didn't.
-         */
-        mSharedPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
 
         initTimePicker()
         initNumberPicker()
@@ -49,6 +46,7 @@ class SleepScheduleActivity : AppCompatActivity(), TimePickerDialog.OnTimeSetLis
                 Toast.makeText(this, "Need to set your Bedtime!", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(this, "Your Sleep Schedule has been set!", Toast.LENGTH_SHORT).show()
+                saveSleepSchedule()
             }
         }
 
@@ -70,10 +68,6 @@ class SleepScheduleActivity : AppCompatActivity(), TimePickerDialog.OnTimeSetLis
 
         number_picker_hours_of_sleep.setOnValueChangedListener { _, _, newValue ->
             mHoursOfSleep = newValue
-
-            // Do not save until mBedTime is set
-            if(mBedTime != -1)
-                saveSleepSchedule()
         }
     }
 
@@ -90,12 +84,7 @@ class SleepScheduleActivity : AppCompatActivity(), TimePickerDialog.OnTimeSetLis
 
     /**
      * Called whenever the user presses the "ok" button
-     *
-     * ToDo:
-     *  For onTimeSet, I think we'll just save hourOfDay as-is since our TimeBlocks are from
-     *  1-24 (I think). We might have to adjust hourOfDay to match the way we define our HourBlock
-     *  Hours.
-     *
+
      *  hourOfDay is from 0-23 where 0 = 12am
      *  However, we have 1-24 where 24 = 12am
      *
@@ -123,32 +112,26 @@ class SleepScheduleActivity : AppCompatActivity(), TimePickerDialog.OnTimeSetLis
         button_bedtime.text = bedTimeString
 
         mBedTime = hourOfDay
-        saveSleepSchedule()
+        if(mBedTime == 0) mBedTime = 24
     }
 
     /**
-     *
      * Saves when a user goes to sleep and last hour they should be asleep.
      *
      * TimePicker makes 0 as 12am, so we just need to change this value to 24
      * since that's the value we associated with 12am
+     *
+     * We're going to be saving onto the Database right here.
+     * I think all we have to do is clear all the tasks under the hourblocks
+     * and change those hourblocks to hold BlockType = RECOVER
      */
     private fun saveSleepSchedule() {
-        if(mBedTime == 0) mBedTime = 24
-
         Log.d(TAG, "saveSleepSchedule: mBedTime: $mBedTime")
         Log.d(TAG, "saveSleepSchedule: mHoursOfSleep: $mHoursOfSleep")
 
-//        val lastHourOfSleep = calculateLastHourOfSleep(mBedTime, mHoursOfSleep)
+        val sleepHours = HourBlock.getRangeOfSleepHours(mBedTime, mHoursOfSleep)
 
-        with(mSharedPreferences.edit()) {
-
-            putInt(getString(R.string.bedtime_start_hour_key), mBedTime)
-            putInt(getString(R.string.hours_of_sleep_key), mHoursOfSleep)
-
-//            putInt(getString(R.string.bedtime_end_hour), lastHourOfSleep)
-            apply()
-        }
+        mRepository.setSleepHourBlocks(sleepHours)
     }
 
     /**

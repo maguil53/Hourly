@@ -14,7 +14,6 @@ import marco.a.aguilar.hourly.enums.TaskType
 @Parcelize
 @Entity(tableName = "tasks")
 data class Task(
-    var type: TaskType, // Might have to create Converter for this column
     var description: String,
     @ColumnInfo(name = "task_block_id") var taskBlockId: Int, // Which Block it belongs to
     @ColumnInfo(name = "is_complete") var isComplete: Boolean = false,

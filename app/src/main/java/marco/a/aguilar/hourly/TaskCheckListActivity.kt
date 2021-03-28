@@ -78,7 +78,7 @@ class TaskCheckListActivity : AppCompatActivity(),
             if(mTaskCheckItemList.size >= 15) {
                 Toast.makeText(this, "You can only have 15 tasks", Toast.LENGTH_SHORT).show()
             } else {
-                val newTask = Task(TaskType.WORK, "", blockId, false)
+                val newTask = Task("", blockId, false)
                 // Setting isNewItem to true so the RecyclerView know how to handle this
                 mTaskCheckItemList.add(TaskCheckItem(newTask, true))
 

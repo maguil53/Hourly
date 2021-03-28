@@ -26,6 +26,19 @@ class HourBlockRepository private constructor(context: Context) {
         return hourBlocks
     }
 
+    fun setSleepHourBlocks(sleepHours: List<Int>) {
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                /**
+                 * Change previous sleepHours (if any) back
+                 * to BlockType.WORK before setting Recover Hour Blocks
+                 */
+                database.hourBlockDao().revertSleepHours()
+                database.hourBlockDao().setRecoverHourBlocks(sleepHours)
+            }
+        }
+    }
+
     fun getTasksCompletedInfo(): LiveData<List<TasksCompletedInfo>> {
         return tasksCompletedInfo
     }

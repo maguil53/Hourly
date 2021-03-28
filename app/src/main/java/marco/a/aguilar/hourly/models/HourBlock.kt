@@ -16,7 +16,7 @@ data class HourBlock(
    @PrimaryKey @ColumnInfo(name = "block_id") var blockId: Int, // 1 - 24
    var time: Int, // 1 - 24
    @ColumnInfo(name = "is_complete") var isComplete: Boolean = false,
-   var blockType: BlockType = BlockType.WORK,
+   @ColumnInfo(name="block_type") var blockType: BlockType = BlockType.WORK,
    @Ignore var tasks: List<Task>? = null
 ) : Parcelable {
 
@@ -77,6 +77,49 @@ data class HourBlock(
          }
 
          return time
+      }
+
+      /**
+       * Say hoursOfSleep is 5
+       *     bedTimeStart is 24
+       *
+       *     hours to sleep (12am, 1am, 2am, 3am, 4am)
+       *
+       *
+       *     do {
+       *          hourToBeAdded += 1
+       *          if(hourToBeAdded > 24)
+       *              hourToBeAdded = 1
+       *
+       *          sleepHours.add(hourToBeAdded)
+       *          remainingHoursOfSleep -= 1
+       *     } while(remainingHoursOfSleep != 0)
+       *
+       *
+       *     sleepHours after loop:
+       *          (24, 1, 2, 3, 4)
+       *               3  2  1  0
+       *
+       */
+      fun getRangeOfSleepHours(bedtimeStart: Int, hoursOfSleep: Int): MutableList<Int> {
+         val sleepHours = mutableListOf(bedtimeStart)
+
+         var hourToBeAdded = bedtimeStart
+         // Subtracting 1 because we added bedtimeStart already
+         var remainingHoursOfSleep = hoursOfSleep - 1
+
+         do {
+            hourToBeAdded += 1
+
+            if(hourToBeAdded > 24)
+               hourToBeAdded = 1
+
+            sleepHours.add(hourToBeAdded)
+            remainingHoursOfSleep -= 1
+         } while (remainingHoursOfSleep != 0)
+
+
+         return sleepHours
       }
 
    }

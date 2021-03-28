@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.progress_item.view.*
 import marco.a.aguilar.hourly.R
+import marco.a.aguilar.hourly.enums.BlockType
 import marco.a.aguilar.hourly.models.HourBlock
 import java.util.*
 
@@ -53,6 +54,15 @@ class ProgressAdapter(private var hourBlocks: List<HourBlock>) :
             Log.d(TAG, "onBindViewHolder: Changing block to Grey")
             holder.itemView.view_hour_block.setBackgroundResource(R.drawable.hour_block_background_limbo)
         }
+
+
+        /**
+         * Place this line AFTER the code above.
+         * No we don't have to worry if an HourBlock isComplete or not,
+         * as long it is of BlockType.RECOVER, then it will be colored green.
+         */
+        if(hourBlocks[position].blockType == BlockType.RECOVER)
+            holder.itemView.view_hour_block.setBackgroundResource(R.drawable.hour_block_background_complete)
 
 
     }

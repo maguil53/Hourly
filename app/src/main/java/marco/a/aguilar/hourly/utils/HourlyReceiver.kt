@@ -32,27 +32,6 @@ class HourlyReceiver : BroadcastReceiver() {
                 val tasks: List<Task> = database.taskDao().getTasksForHourBlock(evaluatedHourBlockId)
                 var hourBlockIsComplete = Task.checkIfAllTasksAreComplete(tasks)
 
-                /**
-                 * Not sure if this will work, if evaluated hour is in one of the sleeping hours,
-                 * make hourBlockIsComplete as true
-                 */
-                val sharedPref = context.getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
-
-                val bedtimeStart = sharedPref.getInt(context.getString(R.string.bedtime_start_hour_key), -1)
-                val hoursOfSleep = sharedPref.getInt(context.getString(R.string.hours_of_sleep_key), -1)
-
-//                val bedtimeEnd = sharedPref.getInt(context.getString(R.string.bedtime_end_hour), -1)
-
-                if(bedtimeStart != -1) {
-                    Log.d(TAG, "onCreateView: bedTimeStart: $bedtimeStart")
-                    Log.d(TAG, "onCreateView: hoursOfSleep: $hoursOfSleep")
-
-                    val listOfSleepHours = getRangeOfSleepHours(bedtimeStart, hoursOfSleep)
-
-                    if(listOfSleepHours.contains(evaluatedHourBlockId))
-                        hourBlockIsComplete = true
-                }
-
 
 
                 // hourBlockIsComplete will determine the color of the square
@@ -83,47 +62,4 @@ class HourlyReceiver : BroadcastReceiver() {
 
     }
 
-    private fun getRangeOfSleepHours(bedtimeStart: Int, hoursOfSleep: Int): MutableList<Int> {
-        val sleepHours = mutableListOf(bedtimeStart)
-
-        var hourToBeAdded = bedtimeStart
-        // Subtracting 1 because we added bedtimeStart already
-        var remainingHoursOfSleep = hoursOfSleep - 1
-
-        do {
-            hourToBeAdded += 1
-
-            if(hourToBeAdded > 24)
-                hourToBeAdded = 1
-
-            sleepHours.add(hourToBeAdded)
-            remainingHoursOfSleep -= 1
-        } while (remainingHoursOfSleep != 0)
-
-
-        return sleepHours
-
-        /**
-         * Say hoursOfSleep is 5
-         *     bedTimeStart is 24
-         *
-         *     hours to sleep (12am, 1am, 2am, 3am, 4am)
-         *
-         *
-         *     do {
-         *          hourToBeAdded += 1
-         *          if(hourToBeAdded > 24)
-         *              hourToBeAdded = 1
-         *
-         *          sleepHours.add(hourToBeAdded)
-         *          remainingHoursOfSleep -= 1
-         *     } while(remainingHoursOfSleep != 0)
-         *
-         *
-         *     sleepHours after loop:
-         *          (24, 1, 2, 3, 4)
-         *               3  2  1  0
-         *
-         */
-    }
 }
