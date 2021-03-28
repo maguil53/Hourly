@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.widget.Toast
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog
 import kotlinx.android.synthetic.main.activity_sleep_schedule.*
 import java.util.*
@@ -41,6 +42,14 @@ class SleepScheduleActivity : AppCompatActivity(), TimePickerDialog.OnTimeSetLis
 
         button_bedtime.setOnClickListener {
             mTimePickerDialog.show(supportFragmentManager, "TimePickerDialog")
+        }
+
+        button_set_sleep_schedule.setOnClickListener {
+            if(mBedTime == -1) {
+                Toast.makeText(this, "Need to set your Bedtime!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Your Sleep Schedule has been set!", Toast.LENGTH_SHORT).show()
+            }
         }
 
     }

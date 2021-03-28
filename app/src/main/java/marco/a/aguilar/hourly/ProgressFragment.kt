@@ -67,27 +67,6 @@ class ProgressFragment : Fragment() {
     }
 
 
-    /**
-     * This works
-     */
-//    override fun onResume() {
-//        super.onResume()
-//
-//        /**
-//         * Testing SharedPreferences
-//         */
-//        val sharedPref = activity?.getSharedPreferences(
-//            sharedPrefFile, MODE_PRIVATE);
-//
-//        val bedtimeStart = sharedPref?.getInt(getString(R.string.bedtime_start_hour), -1)
-//        val bedtimeEnd = sharedPref?.getInt(getString(R.string.bedtime_end_hour), -1)
-//
-//        if(bedtimeStart != -1) {
-//            Log.d(TAG, "onCreateView: bedTimeStart: $bedtimeStart")
-//            Log.d(TAG, "onCreateView: bedTimeStart: $bedtimeEnd")
-//        }
-//    }
-
 
     fun initRecyclerView(view: View) {
         viewManager = GridLayoutManager(activity, 4)
