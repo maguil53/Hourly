@@ -17,9 +17,10 @@
         android:id="@+id/textview_sleep_schedule"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="30sp"
+        android:textSize="35sp"
         android:text="@string/sleep_schedule"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="70dp"
+        android:layout_marginBottom="70dp"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/my_toolbar"/>
 
@@ -30,7 +31,6 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_below="@id/textview_sleep_schedule"
-        android:layout_marginTop="80dp"
         android:weightSum="2"
         android:gravity="center">
 
@@ -66,6 +66,7 @@
 
     <!-- Container for Hours of Sleep row -->
     <LinearLayout
+        android:id="@+id/hours_of_sleep_container"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="100dp"
@@ -102,5 +103,17 @@
 
         </LinearLayout>
     </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_set_sleep_schedule"
+        android:layout_below="@id/hours_of_sleep_container"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp"
+        android:layout_width="wrap_content"
+        android:layout_height="55dp"
+        android:textColor="@color/white"
+        android:theme="@style/Theme.MaterialComponents"
+        app:backgroundTint="@color/colorAccent"
+        android:text="@string/set_sleep_schedule"/>
 
 </RelativeLayout>
