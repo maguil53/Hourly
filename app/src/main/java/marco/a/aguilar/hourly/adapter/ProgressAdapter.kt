@@ -58,8 +58,12 @@ class ProgressAdapter(private var hourBlocks: List<HourBlock>) :
 
         /**
          * Place this line AFTER the code above.
-         * No we don't have to worry if an HourBlock isComplete or not,
-         * as long it is of BlockType.RECOVER, then it will be colored green.
+         * Now we don't have to worry if an HourBlock isComplete or not, as long it is
+         * of BlockType.RECOVER, then it will be colored green.
+         *
+         * In addition, by leaving isComplete as-is, whenever we revert the old sleep hours
+         * we won't have to worry about any additional logic since isComplete should still be
+         * false.
          */
         if(hourBlocks[position].blockType == BlockType.RECOVER)
             holder.itemView.view_hour_block.setBackgroundResource(R.drawable.hour_block_background_complete)

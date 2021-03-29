@@ -35,6 +35,8 @@ class HourBlockRepository private constructor(context: Context) {
                  */
                 database.hourBlockDao().revertSleepHours()
                 database.hourBlockDao().setRecoverHourBlocks(sleepHours)
+                // Delete Tasks associated with Sleep Hours
+                database.taskDao().clearSleepHourTasks(sleepHours)
             }
         }
     }

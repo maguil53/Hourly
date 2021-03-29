@@ -40,6 +40,9 @@ interface TaskDao {
     @Query("DELETE FROM tasks WHERE task_block_id = :task_block_id")
     suspend fun clearTasks(task_block_id: Int)
 
+    @Query("DELETE FROM tasks WHERE task_block_id IN (:sleepHourBlockIds)")
+    suspend fun clearSleepHourTasks(sleepHourBlockIds: List<Int>)
+
     /**
      * This works.
      */
