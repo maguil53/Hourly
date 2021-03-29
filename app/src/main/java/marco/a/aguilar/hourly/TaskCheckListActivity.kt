@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_task_check_list.*
 import marco.a.aguilar.hourly.adapter.TaskCheckListAdapter
+import marco.a.aguilar.hourly.enums.BlockType
 import marco.a.aguilar.hourly.enums.TaskType
 import marco.a.aguilar.hourly.models.Task
 import marco.a.aguilar.hourly.models.TaskCheckItem
@@ -89,6 +90,19 @@ class TaskCheckListActivity : AppCompatActivity(),
         initShortcutButtons()
 
         initRecyclerView()
+
+        /**
+         * Update UI if BlockType.RECOVER
+         *  - Disable/Hide FAB
+         *  - Hide RecyclerView
+         *  - Show "Sleep!" TextView
+         */
+        if(mTasksCompletedInfo.hourBlock.blockType == BlockType.RECOVER) {
+            fab_task_checklist.hide()
+            recycler_view_checklist.visibility = View.GONE
+            textview_sleep_text.visibility = View.VISIBLE
+        }
+
     }
 
     override fun onStop() {

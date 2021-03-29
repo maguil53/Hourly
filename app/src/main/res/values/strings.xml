@@ -21,6 +21,7 @@
     <string name="hours_of_sleep">Hours of Sleep:</string>
     <string name="select">Select</string>
     <string name="set_sleep_schedule">Set Schedule</string>
+    <string name="sleep_text">Sleep!</string>
 
 
     <!-- Shared Preference Keys -->

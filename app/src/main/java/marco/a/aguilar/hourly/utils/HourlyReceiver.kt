@@ -32,6 +32,8 @@ class HourlyReceiver : BroadcastReceiver() {
                 val tasks: List<Task> = database.taskDao().getTasksForHourBlock(evaluatedHourBlockId)
                 var hourBlockIsComplete = Task.checkIfAllTasksAreComplete(tasks)
 
+                Log.d(TAG, "onReceive: evaluatedHourBlockId: $evaluatedHourBlockId")
+
 
 
                 // hourBlockIsComplete will determine the color of the square
