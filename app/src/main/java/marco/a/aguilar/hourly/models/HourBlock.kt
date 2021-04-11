@@ -6,6 +6,7 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import kotlinx.android.parcel.Parcelize
+import marco.a.aguilar.hourly.enums.BlockState
 import marco.a.aguilar.hourly.enums.BlockType
 import marco.a.aguilar.hourly.enums.TaskType
 
@@ -16,12 +17,14 @@ data class HourBlock(
    @PrimaryKey @ColumnInfo(name = "block_id") var blockId: Int, // 1 - 24
    var time: Int, // 1 - 24
    @ColumnInfo(name = "is_complete") var isComplete: Boolean = false,
+   var state: BlockState = BlockState.LIMBO,
    @ColumnInfo(name="block_type") var blockType: BlockType = BlockType.WORK,
    @Ignore var tasks: List<Task>? = null
 ) : Parcelable {
 
 
-   constructor(blockId: Int, time: Int, isComplete: Boolean) : this(blockId, time, isComplete, BlockType.WORK,null){
+   constructor(blockId: Int, time: Int, isComplete: Boolean) : this(blockId, time, isComplete,
+      BlockState.LIMBO, BlockType.WORK,null){
    }
 
    companion object {
@@ -80,11 +83,11 @@ data class HourBlock(
       }
 
       /**
-       * Say hoursOfSleep is 5
+       * Say,
+       *     hoursOfSleep is 5
        *     bedTimeStart is 24
-       *
-       *     hours to sleep (12am, 1am, 2am, 3am, 4am)
-       *
+       * Then,
+       *    hours to sleep (12am, 1am, 2am, 3am, 4am)
        *
        *     do {
        *          hourToBeAdded += 1
@@ -95,14 +98,17 @@ data class HourBlock(
        *          remainingHoursOfSleep -= 1
        *     } while(remainingHoursOfSleep != 0)
        *
-       *
        *     sleepHours after loop:
        *          (24, 1, 2, 3, 4)
        *               3  2  1  0
        *
+       *  If hoursOfSleep is 1, then just add the bedtimeStart to the final
+       *  list and return it.
        */
       fun getRangeOfSleepHours(bedtimeStart: Int, hoursOfSleep: Int): MutableList<Int> {
          val sleepHours = mutableListOf(bedtimeStart)
+
+         if(hoursOfSleep == 1) return sleepHours // Nothing more to do
 
          var hourToBeAdded = bedtimeStart
          // Subtracting 1 because we added bedtimeStart already

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.tasks_item.view.*
 import marco.a.aguilar.hourly.R
+import marco.a.aguilar.hourly.enums.BlockType
 import marco.a.aguilar.hourly.models.HourBlock
 import marco.a.aguilar.hourly.models.TasksCompletedInfo
 
@@ -53,9 +54,13 @@ class TasksAdapter(private var tasksCompletedInfoList: List<TasksCompletedInfo>,
         // May be null
         val hourBlockTasks = tasksCompletedInfoList[position].tasks
 
-        val tasksDescription = if(hourBlockTasks != null && hourBlockTasks.isNotEmpty())
-                                    totalComplete + "/" + hourBlockTasks.size.toString() + " Complete"
-                                else "No Tasks"
+        var tasksDescription = "No Tasks"
+
+        if(hourBlockTasks != null && hourBlockTasks.isNotEmpty())
+            tasksDescription = totalComplete + "/" + hourBlockTasks.size.toString() + " Complete"
+
+        if(tasksCompletedInfoList[position].hourBlock.blockType == BlockType.RECOVER)
+            tasksDescription = "Sleep"
 
         holder.itemView.textview_tasks_number.text = tasksDescription
         holder.itemView.textview_tasks_hour.text = time

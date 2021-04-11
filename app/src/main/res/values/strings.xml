@@ -26,7 +26,8 @@
 
     <!-- Shared Preference Keys -->
     <string name="bedtime_start_hour_key">Bedtime Start Hour Key</string>
-    <string name="bedtime_end_hour">Bedtime End Hour</string>
-    <string name="hours_of_sleep_key">Hours of Sleep Key</string>
+    <string name="is_first_run_key">isFirstRun</string>
+    <string name="marco_a_aguilar_hourly_shared_preference_key">Hourly Shared Preferences Key</string>
+
 
 </resources>

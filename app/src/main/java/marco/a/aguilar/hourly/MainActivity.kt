@@ -1,12 +1,11 @@
 package marco.a.aguilar.hourly
 
-import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.annotation.RequiresApi
@@ -17,38 +16,56 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.activity_main.*
+import marco.a.aguilar.hourly.repository.HourBlockRepository
 import marco.a.aguilar.hourly.utils.AlarmHandler
-import java.util.*
 import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
     private lateinit var mainFragmentAdapter: MainFragmentAdapter
     private lateinit var viewPager: ViewPager2
+    private lateinit var mRepository: HourBlockRepository
 
     companion object {
         @RequiresApi(Build.VERSION_CODES.N)
         val fragmentList: ArrayList<Fragment> = arrayListOf(ProgressFragment(), TasksFragment())
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
 
-        initHourlyAlarm()
+        mRepository = HourBlockRepository.getInstance(this)
+
+        /**
+         * If the app is being opened for the first time, initialize
+         * the alarm service and update SharedPreference's isFirstRun value to false.
+         */
+        val sharedPreferences = this.getSharedPreferences(getString(R.string.marco_a_aguilar_hourly_shared_preference_key),
+            Context.MODE_PRIVATE
+        )
+        val isFirstRun: Boolean = sharedPreferences.getBoolean(getString(R.string.is_first_run_key), true)
+
+        if(isFirstRun) {
+            initHourlyAlarm()
+
+            with(sharedPreferences.edit()) {
+                putBoolean(getString(R.string.is_first_run_key), false)
+                apply()
+            }
+        }
 
         mainFragmentAdapter = MainFragmentAdapter(this)
         viewPager = findViewById(R.id.pager)
         viewPager.adapter = mainFragmentAdapter
 
-        // Attach tab_layout
         /**
          * Attaching TabLayout to ViewPager2. You have to set up the text
          * and drawable here because the icon/text won't show up if you just
          * put it in the XML file.
          */
-
         tab_layout.setBackgroundColor(Color.parseColor("#1F1F1F"))
         tab_layout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
 
@@ -113,15 +130,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-
+    @RequiresApi(Build.VERSION_CODES.M)
     fun initHourlyAlarm() {
-        val alarmHandler = AlarmHandler(this)
-
-        // Cancel previous alarms (if any)
-        alarmHandler.cancelAlarm()
-
-        // Set new alarm
-        alarmHandler.setAlarm()
+        val alarmHandler = AlarmHandler()
+        alarmHandler.setAlarm(this)
     }
 }

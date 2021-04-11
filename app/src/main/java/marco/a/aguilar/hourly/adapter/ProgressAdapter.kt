@@ -1,6 +1,7 @@
 package marco.a.aguilar.hourly.adapter
 
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.progress_item.view.*
 import marco.a.aguilar.hourly.R
+import marco.a.aguilar.hourly.enums.BlockState
 import marco.a.aguilar.hourly.enums.BlockType
 import marco.a.aguilar.hourly.models.HourBlock
 import java.util.*
@@ -32,43 +34,25 @@ class ProgressAdapter(private var hourBlocks: List<HourBlock>) :
 
         holder.itemView.textview_progress_hour.text = HourBlock.getTime(hourBlocks[position].time)
 
-        val calendar: Calendar = Calendar.getInstance()
-        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+        val hourBlockState = hourBlocks[position].state
 
-        if((hour > hourBlocks[position].time)) {
-
-            /**
-             * We only want to make a decision to change a Block color once the time has changed,
-             * otherwise we leave it in a state of limbo.
-             */
-            if(!(hourBlocks[position].isComplete)) {
-                Log.d(TAG, "onBindViewHolder: Changing block to Red")
-                holder.itemView.view_hour_block.setBackgroundResource(R.drawable.hour_block_background_incomplete)
-
-            } else {
-                Log.d(TAG, "onBindViewHolder: Changing block to Green")
-                holder.itemView.view_hour_block.setBackgroundResource(R.drawable.hour_block_background_complete)
+        when(hourBlockState) {
+            BlockState.LIMBO -> {
+                holder.itemView.view_hour_block.setBackgroundResource(R.drawable.hour_block_background_limbo)
             }
 
-        } else {
-            Log.d(TAG, "onBindViewHolder: Changing block to Grey")
-            holder.itemView.view_hour_block.setBackgroundResource(R.drawable.hour_block_background_limbo)
+            BlockState.INCOMPLETE -> {
+                holder.itemView.view_hour_block.setBackgroundResource(R.drawable.hour_block_background_incomplete)
+            }
+
+            BlockState.COMPLETE -> {
+                holder.itemView.view_hour_block.setBackgroundResource(R.drawable.hour_block_background_complete)
+            }
         }
 
-
-        /**
-         * Place this line AFTER the code above.
-         * Now we don't have to worry if an HourBlock isComplete or not, as long it is
-         * of BlockType.RECOVER, then it will be colored green.
-         *
-         * In addition, by leaving isComplete as-is, whenever we revert the old sleep hours
-         * we won't have to worry about any additional logic since isComplete should still be
-         * false.
-         */
+        // Place this line AFTER the code above.
         if(hourBlocks[position].blockType == BlockType.RECOVER)
             holder.itemView.view_hour_block.setBackgroundResource(R.drawable.hour_block_background_complete)
-
-
     }
 
     override fun getItemCount() = hourBlocks.size

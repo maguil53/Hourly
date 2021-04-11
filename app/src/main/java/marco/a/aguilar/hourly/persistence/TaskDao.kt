@@ -43,9 +43,9 @@ interface TaskDao {
     @Query("DELETE FROM tasks WHERE task_block_id IN (:sleepHourBlockIds)")
     suspend fun clearSleepHourTasks(sleepHourBlockIds: List<Int>)
 
-    /**
-     * This works.
-     */
+    @Query("DELETE FROM tasks")
+    suspend fun clearTaskTable()
+
     @Transaction
     @Query("SELECT * FROM hour_blocks")
     fun getTasksInfo(): LiveData<List<TasksCompletedInfo>>

@@ -4,12 +4,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import marco.a.aguilar.hourly.R
+import marco.a.aguilar.hourly.enums.BlockState
 import marco.a.aguilar.hourly.models.Task
 import marco.a.aguilar.hourly.persistence.AppDatabase
 
@@ -17,8 +19,7 @@ private const val TAG = "HourlyReceiver"
 
 class HourlyReceiver : BroadcastReceiver() {
 
-    private val sharedPrefFile = "marco.a.aguilar.hourly.shared_preference"
-
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onReceive(context: Context, intent: Intent) {
         val nextHour: Int = intent.getIntExtra("nextHour", -1)
 
@@ -26,41 +27,55 @@ class HourlyReceiver : BroadcastReceiver() {
             withContext(Dispatchers.IO) {
                 val database = AppDatabase.getInstance(context)
 
-                // Evaluate HourBlock that just passed
-                val evaluatedHourBlockId = nextHour - 1
+                // Evaluate HourBlock that just passed, subtract 1.
+                var evaluatedHourBlockId = nextHour - 1
 
-                val tasks: List<Task> = database.taskDao().getTasksForHourBlock(evaluatedHourBlockId)
-                var hourBlockIsComplete = Task.checkIfAllTasksAreComplete(tasks)
-
-                Log.d(TAG, "onReceive: evaluatedHourBlockId: $evaluatedHourBlockId")
+                // Need to update for 12am, since we use 24
+                if(evaluatedHourBlockId == 0) evaluatedHourBlockId = 24
 
 
+                val sharedPreferences = context.getSharedPreferences("Hourly Shared Preferences Key", MODE_PRIVATE)
+                var bedtime = sharedPreferences.getInt("Bedtime Start Hour Key", -1)
 
-                // hourBlockIsComplete will determine the color of the square
-                database.hourBlockDao().updateIsComplete(hourBlockIsComplete, evaluatedHourBlockId)
 
                 /**
-                 * This part of our code is going to have to wait. Since we want to save the
-                 * user's preference for their sleep schedule. Then we'll implement the logic
-                 * that will determine which blocks should be evaluated. Right now this is how I
-                 * see it. If evaulatedHourBlockId falls in the range of their sleeping schedule,
-                 * then we'll mark it as "Complete" (Also, I think this will allow us to get rid
-                 * of the TaskType attribute for our Task objects but I don't know yet). I think
-                 * we'll end up just leaving it alone and since when the user saves their sleeping
-                 * schedule in the preferences we should mark those blocks as "COMPLETE" so they
-                 * always show up green. Then if the user ever changes their sleep preference we
-                 * should update the database accordingly (mark those HourBlocks as incomplete again
-                 * etc). Finally, we'll only clear the Tasks table for every HourBlock except for the
-                 * last hour before the user goes to sleep because we still want them to see whether
-                 * they got a green/red square. And once the first hour of them waking up is finished
-                 * we'll clear that last block.
+                 * If the user hasn't set their sleep schedule yet, then use 1am as the reset point.
                  *
-                 * Or in Task.checkIfAllTasksAreComplete, return true if the TaskType is RECOVER.
-                 * Which of course will require us to save a "task" in each HourBlock meant for "sleep"
+                 * Todo: In MainActivity, save the "Bedtime Start Hour Key" value to 1am if the application
+                 *  is being ran for the first time. Also, set the 1am hour block
                  */
+                if(bedtime == -1) bedtime = 5
+
+
+                if(evaluatedHourBlockId != bedtime) {
+                    val tasks: List<Task> = database.taskDao().getTasksForHourBlock(evaluatedHourBlockId)
+
+                    val hourBlockIsComplete = Task.checkIfAllTasksAreComplete(tasks)
+
+                    val updatedState: BlockState = if (hourBlockIsComplete) BlockState.COMPLETE else BlockState.INCOMPLETE
+                    database.hourBlockDao().updateState(updatedState, evaluatedHourBlockId)
+
+                    /**
+                     * Todo: Might delete this line because I don't think we'll need isComplete anymore
+                     *  since we're using the state attribute to determine whether an HourBlock is complete
+                     *  or not.
+                     */
+                    database.hourBlockDao().updateIsComplete(hourBlockIsComplete, evaluatedHourBlockId)
+                } else {
+                    // Clear Tasks table and turn all HourBlocks back to LIMBO
+                    database.hourBlockDao().resetHourBlocksState()
+                    database.taskDao().clearTaskTable()
+                }
 
             }
         }
+
+        /**
+         * Re-create a new alarm becuase setExactAndAllowWhileIdle()
+         * is only executes once.
+         */
+        val alarmHandler = AlarmHandler()
+        alarmHandler.setAlarm(context)
 
     }
 

@@ -4,36 +4,34 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.util.Log
+import android.os.Build
+import androidx.annotation.RequiresApi
 import java.util.*
 
-class AlarmHandler(val context: Context) {
+class AlarmHandler() {
 
     private var alarmManager: AlarmManager? = null
-    private var alarmIntent: PendingIntent
     private val nextHour: Int = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + 1
     private val TAG = "AlarmHandler"
 
-    init {
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun setAlarm(context: Context) {
         val intent = Intent(context, HourlyReceiver::class.java)
         intent.putExtra("nextHour", nextHour)
 
-        alarmIntent = PendingIntent.getBroadcast(context, 0 , intent, 0)
-    }
+        // Using FLAG_UPDATE_CURRENT didn't work for me.
+        val alarmIntent = PendingIntent.getBroadcast(context, 0 , intent, PendingIntent.FLAG_CANCEL_CURRENT)
 
-    fun setAlarm() {
         alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         /**
          * Set the alarm to start at next hour.
-         *  Ex: If it's 2:45pm, Alarm will start at 3pm and should
-         *  update HourBlock for Hour 2.
+         *  Ex: If it's 2:45pm, Alarm will start at 3pm.
          *
-         * Why? Because if the user is starting their day at 8:30am, you don't want
-         * the Alarm to be triggered immediately. Since not having the "+1" will
-         * mean the alarm should execute at 8:00am, which it will once the user opens
-         * the app. Not only that, but it will keep executing our alarm if the user
-         * keeps opening and closing the app. This is why we need the +1 in nextHour
+         * If you schedule the alarm for the current hour, then the code
+         * inside HourlyReceiver will be executed immediately. We don't want
+         * this behavior if the user barely opens the app and sees a red square.
+         * This is why we initialize nextHour by adding 1 to the current hour.
          */
         val calendar: Calendar = Calendar.getInstance().apply {
             timeInMillis = System.currentTimeMillis()
@@ -42,28 +40,17 @@ class AlarmHandler(val context: Context) {
             set(Calendar.MINUTE, 0)
         }
 
-        Log.d(TAG, "setAlarm: nextHour: $nextHour")
 
         /**
-         * setRepeating() helps specify a custom interval in this case, every Hour
-         *
-         * Formula: 1000 * 60 * mins
+         * setExactAndAllowWhileIdle() works even if device
+         * is in Doze mode, but will only be called once. So we
+         * need to re-create our alarm in HourlyReceiver
          */
-        alarmManager?.setRepeating(
+        alarmManager?.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             calendar.timeInMillis,
-            1000 * 60 * 60,
             alarmIntent
         )
-    }
-
-    /**
-     * Make sure alarmIntent is initialized before calling cancelAlarm()
-     * or you'll get an exception
-     */
-    fun cancelAlarm() {
-        // If the alarm has been set, cancel it.
-        alarmManager?.cancel(alarmIntent)
     }
 
 }

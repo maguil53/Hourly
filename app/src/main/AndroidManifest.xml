@@ -27,7 +27,9 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".utils.HourlyReceiver" />
+        <receiver android:name=".utils.HourlyReceiver">
+        </receiver>
+
     </application>
 
 </manifest>
