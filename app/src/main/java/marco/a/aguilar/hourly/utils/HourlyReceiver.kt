@@ -37,16 +37,6 @@ class HourlyReceiver : BroadcastReceiver() {
                 val sharedPreferences = context.getSharedPreferences("Hourly Shared Preferences Key", MODE_PRIVATE)
                 var bedtime = sharedPreferences.getInt("Bedtime Start Hour Key", -1)
 
-
-                /**
-                 * If the user hasn't set their sleep schedule yet, then use 1am as the reset point.
-                 *
-                 * Todo: In MainActivity, save the "Bedtime Start Hour Key" value to 1am if the application
-                 *  is being ran for the first time. Also, set the 1am hour block
-                 */
-                if(bedtime == -1) bedtime = 5
-
-
                 if(evaluatedHourBlockId != bedtime) {
                     val tasks: List<Task> = database.taskDao().getTasksForHourBlock(evaluatedHourBlockId)
 

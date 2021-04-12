@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
 
         if(isFirstRun) {
             initHourlyAlarm()
+            saveDefaultSleepSchedule()
 
             with(sharedPreferences.edit()) {
                 putBoolean(getString(R.string.is_first_run_key), false)
@@ -134,5 +135,24 @@ class MainActivity : AppCompatActivity() {
     fun initHourlyAlarm() {
         val alarmHandler = AlarmHandler()
         alarmHandler.setAlarm(this)
+    }
+
+    /**
+     * When the user first opens the app, their
+     * sleep schedule will be set from 12am - 7am (8hrs)
+     */
+    private fun saveDefaultSleepSchedule() {
+        val bedtime = 24
+        val sleepHours: List<Int> = listOf(bedtime, 1, 2, 3, 4, 5, 6, 7)
+        mRepository.setSleepHourBlocks(sleepHours)
+
+        // Store betime in SharedPreferences
+        val sharedPreferences = this.getSharedPreferences(getString(R.string.marco_a_aguilar_hourly_shared_preference_key),
+            Context.MODE_PRIVATE)
+
+        with(sharedPreferences.edit()) {
+            putInt(getString(R.string.bedtime_start_hour_key), bedtime)
+            apply()
+        }
     }
 }
