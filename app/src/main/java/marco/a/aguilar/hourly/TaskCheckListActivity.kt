@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_task_check_list.*
 import marco.a.aguilar.hourly.adapter.TaskCheckListAdapter
 import marco.a.aguilar.hourly.enums.BlockType
-import marco.a.aguilar.hourly.enums.TaskType
 import marco.a.aguilar.hourly.models.Task
 import marco.a.aguilar.hourly.models.TaskCheckItem
 import marco.a.aguilar.hourly.models.TasksCompletedInfo
@@ -32,12 +31,13 @@ import marco.a.aguilar.hourly.repository.HourBlockRepository
 /**
  * Todo: Wipe the Tasks Table from the Database after the 24th hour, users shouldn't
  *  see the tasks they wrote from the previous day.
+ *
+ *  Todo: Bug, creating a new task and then deleting it before you leave the Activity will
+ *   persist the task even though you deleted it.
  */
 
 class TaskCheckListActivity : AppCompatActivity(),
     TaskCheckListAdapter.OnTaskCheckItemInteractionListener {
-
-    private val TAG = "TaskCheckListActivity"
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewManager: LinearLayoutManager
@@ -73,19 +73,7 @@ class TaskCheckListActivity : AppCompatActivity(),
         // Get a support ActionBar corresponding to this toolbar and enable the Up button
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        fab_task_checklist.setOnClickListener {
-            val blockId = mTasksCompletedInfo.hourBlock.blockId
-
-            if(mTaskCheckItemList.size >= 15) {
-                Toast.makeText(this, "You can only have 15 tasks", Toast.LENGTH_SHORT).show()
-            } else {
-                val newTask = Task("", blockId, false)
-                // Setting isNewItem to true so the RecyclerView know how to handle this
-                mTaskCheckItemList.add(TaskCheckItem(newTask, true))
-
-                viewAdapter.notifyItemInserted(mTaskCheckItemList.size - 1)
-            }
-        }
+        initAddTaskFab()
 
         initShortcutButtons()
 
@@ -105,11 +93,25 @@ class TaskCheckListActivity : AppCompatActivity(),
 
     }
 
+    private fun initAddTaskFab() {
+        fab_task_checklist.setOnClickListener {
+            val blockId = mTasksCompletedInfo.hourBlock.blockId
+
+            if (mTaskCheckItemList.size >= 15) {
+                Toast.makeText(this, "You can only have 15 tasks", Toast.LENGTH_SHORT).show()
+            } else {
+                val newTask = Task("", blockId, false)
+                // Setting isNewItem to true so the RecyclerView know how to handle this
+                mTaskCheckItemList.add(TaskCheckItem(task = newTask, isNewItem = true))
+
+                viewAdapter.notifyItemInserted(mTaskCheckItemList.size - 1)
+            }
+        }
+    }
+
     override fun onStop() {
         super.onStop()
-
         hideKeyboard(this)
-
         insertTasks()
     }
 
@@ -128,31 +130,19 @@ class TaskCheckListActivity : AppCompatActivity(),
         viewManager = LinearLayoutManager(this)
         viewAdapter = TaskCheckListAdapter(mTaskCheckItemList, this)
 
-        /**
-         * Okay, for some reason, if I scroll to position this way then it works.
-         * I think my issue was that the Adapter wasn't finished inserting the item and
-         * creating the UI fast enough (some kind of asynchronous issue). Some people
-         * suggested creating a delay before calling scrollToPosition() but I think
-         * using RecyclerView.AdapterDataObserver is better.
-         */
+        // Scrolls to recently added item.
         viewAdapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 recyclerView.scrollToPosition(viewAdapter.itemCount - 1)
             }
         })
 
-        /**
-         * The Scope Function apply() allows us to set the values for our
-         * recyclerView's member variables
-         */
         recyclerView = recycler_view_checklist.apply {
             layoutManager = viewManager
             adapter = viewAdapter
         }
 
-        // Used for swiping left to delete
-        val simpleCallback = getItemTouchHelperSimpleCallback(this)
-        ItemTouchHelper(simpleCallback).attachToRecyclerView(recyclerView)
+        ItemTouchHelper(getItemTouchHelperSimpleCallback(this)).attachToRecyclerView(recyclerView)
     }
 
     private fun initShortcutButtons() {
@@ -196,50 +186,32 @@ class TaskCheckListActivity : AppCompatActivity(),
         editText.setSelection(editText.text.length)
         editText.append(stringValue)
 
-        /**
-         * This solved my issue! The keyboard now shows. Thanks to this article:
-         *  https://android.jlelse.eu/android-how-to-synchronize-keyboard-with-edittext-focus-8c1113797a15
-         */
-        // Might need to figure out a different way to do this since, toggle isn't really what we want.
         val imm = editText.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
         imm?.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
     }
 
-    /**
-     * Without !recyclerView.isComputingLayout we get a
-     *      "Cannot call this method while RecyclerView is computing a layout or scrolling"
-     * when try remove/add item from recyclerview
-     */
     override fun onTaskCheckItemFocusChanged(position: Int, editText: EditText, textView: TextView, hasFocus: Boolean) {
-
-
         if(!hasFocus) {
-            enableFAB()
+            enableFab()
             disableShortcutButtons()
 
-            var editTextContent = editText.text.toString().trim()
-            val textViewContent = textView.text.toString()
-
-            // This should go at the top
             editText.visibility = View.GONE
             textView.visibility = View.VISIBLE
 
-            // Clear text once we are done using it.
+            val editTextContent = editText.text.toString().trim()
             editText.text.clear()
 
-            /**
-             * Make sure to return if the item has already been deleted by shortcut button
-             */
+            // Return if the item has already been deleted by shortcut button
             if(!mTaskCheckItemList.contains(mMostRecentFocusedTaskCheckItem))
                 return
 
             val taskCheckItem = mTaskCheckItemList[position]
 
+            // Edit adapter content if recycler view is not computing layout.
             if(!recyclerView.isComputingLayout) {
                 when {
                     taskCheckItem.isNewItem -> {
                         if(editTextContent.isEmpty()) {
-
                             // Do nothing in DB, just delete it from list and notify RV
                             mTaskCheckItemList.remove(taskCheckItem)
                             viewAdapter.notifyDataSetChanged()
@@ -257,7 +229,7 @@ class TaskCheckListActivity : AppCompatActivity(),
                     }
                     // Old item
                     !taskCheckItem.isNewItem -> {
-                        if(editTextContent.isNotEmpty() && editTextContent != textViewContent) {
+                        if(editTextContent.isNotEmpty() && editTextContent != textView.text.toString()) {
                             textView.text = editTextContent
                             taskCheckItem.task.description = editTextContent
 
@@ -269,20 +241,15 @@ class TaskCheckListActivity : AppCompatActivity(),
             }
 
         } else {
-            disableFAB()
+            disableFab()
             enableShortcutButtons()
 
-            Log.d(TAG, "onTaskCheckItemFocusChanged: Focused...")
-            // Replace currently focused task
             mMostRecentFocusedTaskCheckItem = mTaskCheckItemList[position]
-            Log.d(TAG, "onTaskCheckItemFocusChanged: $mMostRecentFocusedTaskCheckItem")
         }
 
     }
 
     override fun onTaskChecked(position: Int, isComplete: Boolean) {
-        Log.d(TAG, "onTaskChecked: Updating task at position: $position")
-        
         val updatedTask = mTaskCheckItemList[position].task
         updatedTask.isComplete = isComplete
 
@@ -304,7 +271,6 @@ class TaskCheckListActivity : AppCompatActivity(),
                 ContextCompat.getColor(this, R.color.white)
             )
         }
-
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -340,14 +306,14 @@ class TaskCheckListActivity : AppCompatActivity(),
         }
     }
 
-    fun removeUnsavedTaskCheckItem(newTaskCheckItem: TaskCheckItem) {
+    private fun removeUnsavedTaskCheckItem(newTaskCheckItem: TaskCheckItem) {
         mTaskCheckItemList.remove(newTaskCheckItem)
         viewAdapter.notifyDataSetChanged()
         hideKeyboard(this)
     }
 
     // Removes saved Task from database
-    fun removeSavedTaskCheckItem(oldTaskCheckItem: TaskCheckItem) {
+    private fun removeSavedTaskCheckItem(oldTaskCheckItem: TaskCheckItem) {
         hideKeyboard(this)
 
         deleteTask(oldTaskCheckItem.task)
@@ -356,7 +322,7 @@ class TaskCheckListActivity : AppCompatActivity(),
         viewAdapter.notifyDataSetChanged()
     }
 
-    fun hideKeyboard(activity: Activity) {
+    private fun hideKeyboard(activity: Activity) {
         val imm = activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         // Find the currently focused view, so we can grab the correct window token from it.
         var view = activity.currentFocus
@@ -367,25 +333,25 @@ class TaskCheckListActivity : AppCompatActivity(),
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    fun disableFAB(): Unit {
+    private fun disableFab() {
         fab_task_checklist.isEnabled = false
         fab_task_checklist.visibility = View.GONE
     }
 
-    fun enableFAB(): Unit {
+    private fun enableFab() {
         fab_task_checklist.isEnabled = true
         fab_task_checklist.visibility = View.VISIBLE
     }
 
-    fun enableShortcutButtons() {
+    private fun enableShortcutButtons() {
         shortcut_buttons_container.visibility = View.VISIBLE
     }
 
-    fun disableShortcutButtons() {
+    private fun disableShortcutButtons() {
         shortcut_buttons_container.visibility = View.GONE
     }
 
-    fun updateTask(updatedTask: Task) {
+    private fun updateTask(updatedTask: Task) {
         mRepository.updateTask(updatedTask)
     }
 
@@ -393,34 +359,21 @@ class TaskCheckListActivity : AppCompatActivity(),
         mRepository.deleteTask(deletedTask)
     }
 
-    /**
-     * This code was taken from this post:
-     *  https://stackoverflow.com/questions/6677969/tap-outside-edittext-to-lose-focus
-     *
-     *  This is one of the few ways to make our EditText lose focus when clicking
-     *  outside of the EditText.
-     *
-     *  Note: We can also use this code for our Temi application!
-     *
-     *  Update(2/17/21)
-     *      Added another condition to the if statement so that it the keyboard won't close if
-     *      the buttons inside the shortcuts container are clicked. This also help fix the bug
-     *      where the buttons weren't triggering the click event.
-     */
+    // Makes EditText lose focus when clicking outside of it.
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
         if(event?.action == MotionEvent.ACTION_DOWN) {
             val v: View? = currentFocus
 
             if(v != null) {
                 if(v is EditText) {
-                    val outRect: Rect = Rect()
+                    val outRect = Rect()
                     v.getGlobalVisibleRect(outRect)
 
                     val shortCutContainerRect = Rect()
                     shortcut_buttons_container.getGlobalVisibleRect(shortCutContainerRect)
 
-                    if(!outRect.contains(event.getRawX().toInt(), event.getRawY().toInt())
-                        && !shortCutContainerRect.contains(event.getRawX().toInt(), event.getRawY().toInt())) {
+                    if(!outRect.contains(event.rawX.toInt(), event.rawY.toInt())
+                        && !shortCutContainerRect.contains(event.rawX.toInt(), event.rawY.toInt())) {
                         v.clearFocus()
                         val imm: InputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                         imm.hideSoftInputFromWindow(v.windowToken, 0)
@@ -428,13 +381,10 @@ class TaskCheckListActivity : AppCompatActivity(),
                 }
             }
         }
-
         return super.dispatchTouchEvent(event)
     }
 
-    /**
-     * Implementing Swipe left to delete with ItemTouchHelper.SimpleCallback
-     */
+    // Implementing Swipe left to delete with ItemTouchHelper.SimpleCallback
     private fun getItemTouchHelperSimpleCallback(context: Context): ItemTouchHelper.SimpleCallback {
         return object: ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
                 override fun onMove(
@@ -445,10 +395,6 @@ class TaskCheckListActivity : AppCompatActivity(),
                     return false
                 }
 
-            /**
-             * Not Using removeSavedTask() here because we're using viewHolder.adapterPosition
-             * to specify which item was removed.
-             */
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                     val deletedTask = mTaskCheckItemList[viewHolder.adapterPosition].task
                     deleteTask(deletedTask)

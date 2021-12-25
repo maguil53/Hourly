@@ -1,34 +1,24 @@
 package marco.a.aguilar.hourly
 
-import android.content.ContentValues
-import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
-import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import marco.a.aguilar.hourly.adapter.ProgressAdapter
 import marco.a.aguilar.hourly.adapter.TasksAdapter
-import marco.a.aguilar.hourly.models.HourBlock
 import marco.a.aguilar.hourly.models.TasksCompletedInfo
-import marco.a.aguilar.hourly.persistence.AppDatabase
 import marco.a.aguilar.hourly.viewmodel.TasksViewModel
-
-import java.util.*
 
 
 @RequiresApi(Build.VERSION_CODES.N)
@@ -50,7 +40,6 @@ class TasksFragment : Fragment(), TasksAdapter.OnHourTasksListener {
 
         ViewModelProvider(this, TasksViewModel.TasksViewModelFactory(activity.application))
             .get(TasksViewModel::class.java)
-
     }
 
     override fun onCreateView(
@@ -58,7 +47,6 @@ class TasksFragment : Fragment(), TasksAdapter.OnHourTasksListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         val view = inflater.inflate(R.layout.fragment_tasks, container, false)
 
         initRecyclerView(view)
@@ -71,7 +59,7 @@ class TasksFragment : Fragment(), TasksAdapter.OnHourTasksListener {
 
         viewModel.tasksCompletedInfoList.observe(viewLifecycleOwner) {
             /**
-             * A coroutine used to calculate how many tasks are completed in an HourBlock. It
+             * Calculates how many tasks are completed in an HourBlock. It
              * just takes the list of tasks from taskCompleteInfo and counts the tasks that have
              * isComplete set to true. Then it sets the final value to the instance variable,
              * totalComplete.
@@ -79,10 +67,9 @@ class TasksFragment : Fragment(), TasksAdapter.OnHourTasksListener {
             viewLifecycleOwner.lifecycleScope.launch {
                 withContext(Dispatchers.IO) {
                     it.forEach { taskCompleteInfo ->
-                        var calculatedComplete = taskCompleteInfo.tasks?.sumBy { if(it.isComplete) 1 else 0 }
-                        calculatedComplete = calculatedComplete ?: 0
+                        val numOfCompleted = taskCompleteInfo.tasks?.sumBy { if(it.isComplete) 1 else 0 } ?: 0
 
-                        taskCompleteInfo.totalComplete = calculatedComplete
+                        taskCompleteInfo.totalComplete = numOfCompleted
                     }
                 }
 
@@ -98,12 +85,9 @@ class TasksFragment : Fragment(), TasksAdapter.OnHourTasksListener {
             }
 
         }
-
-
     }
 
-    fun initRecyclerView(view: View) {
-
+    private fun initRecyclerView(view: View) {
         viewManager = LinearLayoutManager(activity)
         /**
          * I think this is what's causing the little stutter when swiping from ProgressFragment to
@@ -115,29 +99,17 @@ class TasksFragment : Fragment(), TasksAdapter.OnHourTasksListener {
 //        viewAdapter = TasksAdapter(blankTasksCompletedInfo, this)
         viewAdapter = TasksAdapter(TasksCompletedInfo.generateBlankTasksCompletedInfo(), this)
 
-
         recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_tasks).apply {
-            // use this setting to improve performance if you know that changes
-            // in content do not change the layout size of the RecyclerView
             setHasFixedSize(true)
-
-            // use a grid layout manager
             layoutManager = viewManager
-
-            // specify an viewAdapter
             adapter = viewAdapter
         }
     }
 
     override fun onHourTasksClicked(position: Int) {
         val tasksCompletedInfo = viewModel.tasksCompletedInfoList.value?.get(position)
-
         val intent = Intent(activity, TaskCheckListActivity::class.java)
 
-        /**
-         * Passing the entire object because we're going to be using the HourBlock's id
-         * to save the list of Tasks to our Database.
-         */
         if (tasksCompletedInfo != null)
             intent.putExtra("TasksCompletedInfo", tasksCompletedInfo)
 

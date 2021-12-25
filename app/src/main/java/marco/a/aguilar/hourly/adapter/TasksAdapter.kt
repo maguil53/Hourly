@@ -13,7 +13,7 @@ import marco.a.aguilar.hourly.models.HourBlock
 import marco.a.aguilar.hourly.models.TasksCompletedInfo
 
 class TasksAdapter(private var tasksCompletedInfoList: List<TasksCompletedInfo>,
-                   var mOnHourTasksListener: OnHourTasksListener) :
+                   private var mOnHourTasksListener: OnHourTasksListener) :
         RecyclerView.Adapter<TasksAdapter.TasksViewHolder>() {
 
     /**
@@ -21,7 +21,7 @@ class TasksAdapter(private var tasksCompletedInfoList: List<TasksCompletedInfo>,
      * Because technically these are still Hour Blocks, we're just showing
      * how many tasks it has.
      */
-    class TasksViewHolder(private val tasksItem: View, private val onHourTasksListener: OnHourTasksListener):
+    class TasksViewHolder(tasksItem: View, private val onHourTasksListener: OnHourTasksListener):
         RecyclerView.ViewHolder(tasksItem), View.OnClickListener {
 
         init {
@@ -37,7 +37,6 @@ class TasksAdapter(private var tasksCompletedInfoList: List<TasksCompletedInfo>,
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TasksViewHolder {
-
         val tasksItem = LayoutInflater.from(parent.context)
             .inflate(R.layout.tasks_item, parent, false)
 
