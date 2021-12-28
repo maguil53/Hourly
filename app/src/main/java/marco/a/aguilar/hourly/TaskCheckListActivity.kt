@@ -31,9 +31,6 @@ import marco.a.aguilar.hourly.repository.HourBlockRepository
 /**
  * Todo: Wipe the Tasks Table from the Database after the 24th hour, users shouldn't
  *  see the tasks they wrote from the previous day.
- *
- *  Todo: Bug, creating a new task and then deleting it before you leave the Activity will
- *   persist the task even though you deleted it.
  */
 
 class TaskCheckListActivity : AppCompatActivity(),
@@ -396,8 +393,10 @@ class TaskCheckListActivity : AppCompatActivity(),
                 }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    val deletedTask = mTaskCheckItemList[viewHolder.adapterPosition].task
-                    deleteTask(deletedTask)
+                    val task = mTaskCheckItemList[viewHolder.adapterPosition].task
+                    val wasNewTaskRemoved = mTasksToBeInserted.remove(task)
+                    if(!wasNewTaskRemoved)
+                        deleteTask(task)
 
                     mTaskCheckItemList.removeAt(viewHolder.adapterPosition)
                     viewAdapter.notifyDataSetChanged()
